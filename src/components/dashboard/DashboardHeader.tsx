@@ -1,8 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { MapPin, Wheat, Settings, Sprout, Bell } from "lucide-react";
+import { MapPin, Wheat, Settings, Sprout, Bell, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { District, Crop } from "@/context/AgriContext";
 
 interface DashboardHeaderProps {
@@ -70,10 +78,40 @@ export function DashboardHeader({ district, crop }: DashboardHeaderProps) {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="relative">
-                            <Bell className="w-5 h-5 text-[#6B7280]" />
-                            <span className="absolute top-1 right-1 w-2 h-2 bg-[#E63946] rounded-full" />
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="relative cursor-pointer">
+                                    <Bell className="w-5 h-5 text-[#6B7280]" />
+                                    <span className="absolute top-1 right-1 w-2 h-2 bg-[#E63946] rounded-full animate-pulse" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-80">
+                                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="cursor-pointer">
+                                    <div className="flex items-start gap-2">
+                                        <div className="p-1 bg-red-100 rounded-full mt-1">
+                                            <Bug className="w-3 h-3 text-red-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">High Risk Disease Alert</p>
+                                            <p className="text-xs text-gray-500">Leaf Curl Virus detected in your area.</p>
+                                        </div>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer">
+                                    <div className="flex items-start gap-2">
+                                        <div className="p-1 bg-yellow-100 rounded-full mt-1">
+                                            <Wheat className="w-3 h-3 text-yellow-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-sm">Weather Update</p>
+                                            <p className="text-xs text-gray-500">Light rain expected tomorrow.</p>
+                                        </div>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>

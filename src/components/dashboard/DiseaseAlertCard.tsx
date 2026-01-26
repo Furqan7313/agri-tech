@@ -4,6 +4,14 @@ import { AlertTriangle, Bug, Info, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
 import { District, Crop } from "@/context/AgriContext";
 
 interface DiseaseAlertCardProps {
@@ -106,13 +114,72 @@ export function DiseaseAlertCard({ district, crop }: DiseaseAlertCardProps) {
                 </div>
 
                 {/* Action Button */}
-                <Button
-                    variant="outline"
-                    className="w-full border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332] hover:text-white transition-all"
-                >
-                    View Treatment Details
-                    <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
+                <Sheet>
+                    <SheetTrigger asChild>
+                        <Button
+                            variant="outline"
+                            className="w-full border-[#1B4332] text-[#1B4332] hover:bg-[#1B4332] hover:text-white transition-all cursor-pointer"
+                        >
+                            View Treatment Details
+                            <ChevronRight className="w-4 h-4 ml-1" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right">
+                        <SheetHeader>
+                            <SheetTitle className="flex items-center gap-2 text-xl font-heading">
+                                <Bug className={`w-6 h-6 ${config.textColor}`} />
+                                {disease.name}
+                            </SheetTitle>
+                            <SheetDescription>
+                                Detected in {district} district for {crop} crop.
+                            </SheetDescription>
+                        </SheetHeader>
+
+                        <div className="mt-6 space-y-6">
+                            {/* Severity Badge */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-500">Severity Level:</span>
+                                <Badge variant="outline" className={`${config.textColor} border-current`}>
+                                    {config.label}
+                                </Badge>
+                            </div>
+
+                            {/* Symptoms Section */}
+                            <div>
+                                <h4 className="flex items-center gap-2 font-semibold text-[#1B4332] mb-3">
+                                    <Info className="w-4 h-4" />
+                                    Identified Symptoms
+                                </h4>
+                                <ul className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                    {disease.symptoms.map((symptom, idx) => (
+                                        <li key={idx} className="flex items-start gap-3 text-sm text-[#1F2937]">
+                                            <span className={`w-2 h-2 ${config.color} rounded-full mt-1.5 flex-shrink-0`} />
+                                            {symptom}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* Treatment Section */}
+                            <div>
+                                <h4 className="flex items-center gap-2 font-semibold text-[#1B4332] mb-3">
+                                    <div className="p-1 bg-[#1B4332] rounded">
+                                        <Bug className="w-3 h-3 text-white" />
+                                    </div>
+                                    Recommended Treatment
+                                </h4>
+                                <div className="p-4 bg-[#F8F9F1] rounded-lg border border-[#E5E7EB]">
+                                    <p className="text-sm text-[#1F2937] leading-relaxed">
+                                        {disease.treatment}
+                                    </p>
+                                    <div className="mt-4 pt-3 border-t border-[#E5E7EB] text-xs text-[#6B7280]">
+                                        * Please consult with a local agricultural expert before applying chemical treatments.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </SheetContent>
+                </Sheet>
             </CardContent>
         </Card>
     );
