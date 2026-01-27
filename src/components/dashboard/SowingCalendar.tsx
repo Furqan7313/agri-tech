@@ -3,7 +3,8 @@
 import { Calendar, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Crop, District } from "@/context/AgriContext";
+import { Crop, District, useAgri } from "@/context/AgriContext";
+import { getTranslation } from "@/lib/i18n";
 
 interface SowingCalendarProps {
     crop: Crop;
@@ -19,52 +20,70 @@ interface SowingWindow {
 }
 
 // Sowing windows based on crop and district
-const getSowingData = (crop: Crop, district: District): SowingWindow => {
+const getSowingData = (crop: Crop, district: District, language: string): SowingWindow => {
+    const isUrdu = language === 'ur';
+
+    // Helper to translate months if needed (simple mapping)
+    // Actually we can just return English keys or localized strings directly here
+    // For specific dates "Nov 1", we hardcode translation logic
+
     const sowingWindows: Record<Crop, Record<District, SowingWindow>> = {
         Wheat: {
             Multan: {
-                startMonth: "November",
-                endMonth: "December",
-                optimalDates: "Nov 1 - Nov 25",
+                startMonth: isUrdu ? "نومبر" : "November",
+                endMonth: isUrdu ? "دسمبر" : "December",
+                optimalDates: isUrdu ? "یکم نومبر - 25 نومبر" : "Nov 1 - Nov 25",
                 status: "past",
-                recommendation: "Optimal sowing window has passed. Consider early maturing varieties if planting now.",
+                recommendation: isUrdu
+                    ? "بہترین بوائی کا وقت گزر چکا ہے۔ اگر ابھی کاشت کر رہے ہیں تو جلد پکنے والی اقسام پر غور کریں۔"
+                    : "Optimal sowing window has passed. Consider early maturing varieties if planting now.",
             },
             Jhelum: {
-                startMonth: "October",
-                endMonth: "November",
-                optimalDates: "Oct 15 - Nov 15",
+                startMonth: isUrdu ? "اکتوبر" : "October",
+                endMonth: isUrdu ? "نومبر" : "November",
+                optimalDates: isUrdu ? "15 اکتوبر - 15 نومبر" : "Oct 15 - Nov 15",
                 status: "past",
-                recommendation: "Optimal sowing window has passed. Focus on crop management for existing plantings.",
+                recommendation: isUrdu
+                    ? "بہترین بوائی کا وقت گزر چکا ہے۔ موجودہ فصل کی دیکھ بھال پر توجہ دیں۔"
+                    : "Optimal sowing window has passed. Focus on crop management for existing plantings.",
             },
             Khanewal: {
-                startMonth: "November",
-                endMonth: "December",
-                optimalDates: "Nov 5 - Nov 30",
+                startMonth: isUrdu ? "نومبر" : "November",
+                endMonth: isUrdu ? "دسمبر" : "December",
+                optimalDates: isUrdu ? "5 نومبر - 30 نومبر" : "Nov 5 - Nov 30",
                 status: "past",
-                recommendation: "Late sowing may reduce yields by 15-20%. Consider adjusting fertilizer application.",
+                recommendation: isUrdu
+                    ? "تاخیر سے کاشت پیداوار میں 15-20٪ کمی کر سکتی ہے۔ کھاد کے استعمال کو ایڈجسٹ کریں۔"
+                    : "Late sowing may reduce yields by 15-20%. Consider adjusting fertilizer application.",
             },
         },
         Cotton: {
             Multan: {
-                startMonth: "April",
-                endMonth: "May",
-                optimalDates: "Apr 15 - May 15",
+                startMonth: isUrdu ? "اپریل" : "April",
+                endMonth: isUrdu ? "مئی" : "May",
+                optimalDates: isUrdu ? "15 اپریل - 15 مئی" : "Apr 15 - May 15",
                 status: "upcoming",
-                recommendation: "Prepare land now. Optimal sowing window approaching in approximately 3 months.",
+                recommendation: isUrdu
+                    ? "زمین تیار کریں. بہترین بوائی کا وقت تقریباً 3 ماہ میں آ رہا ہے۔"
+                    : "Prepare land now. Optimal sowing window approaching in approximately 3 months.",
             },
             Jhelum: {
-                startMonth: "May",
-                endMonth: "June",
-                optimalDates: "May 1 - May 31",
+                startMonth: isUrdu ? "مئی" : "May",
+                endMonth: isUrdu ? "جون" : "June",
+                optimalDates: isUrdu ? "یکم مئی - 31 مئی" : "May 1 - May 31",
                 status: "upcoming",
-                recommendation: "Begin seed selection and land preparation. Consider Bt cotton varieties for pest resistance.",
+                recommendation: isUrdu
+                    ? "بیج کا انتخاب اور زمین کی تیاری شروع کریں۔ کیڑوں کے خلاف مزاحمت کے لیے بی ٹی کاٹن کی اقسام پر غور کریں۔"
+                    : "Begin seed selection and land preparation. Consider Bt cotton varieties for pest resistance.",
             },
             Khanewal: {
-                startMonth: "April",
-                endMonth: "May",
-                optimalDates: "Apr 20 - May 20",
+                startMonth: isUrdu ? "اپریل" : "April",
+                endMonth: isUrdu ? "مئی" : "May",
+                optimalDates: isUrdu ? "20 اپریل - 20 مئی" : "Apr 20 - May 20",
                 status: "upcoming",
-                recommendation: "Arrange irrigation infrastructure. Early sowing leads to better pest management.",
+                recommendation: isUrdu
+                    ? "آبپاشی کا انتظام کریں۔ ابتدائی بوائی کیڑوں کے بہتر انتظام کا باعث بنتی ہے۔"
+                    : "Arrange irrigation infrastructure. Early sowing leads to better pest management.",
             },
         },
     };
@@ -72,10 +91,10 @@ const getSowingData = (crop: Crop, district: District): SowingWindow => {
 };
 
 const statusConfig = {
-    past: { bg: "bg-[#6B7280]", text: "Completed", icon: <CheckCircle className="w-4 h-4" /> },
-    optimal: { bg: "bg-[#52B788]", text: "Optimal Now", icon: <CheckCircle className="w-4 h-4" /> },
-    late: { bg: "bg-[#E9C46A]", text: "Late Window", icon: <AlertCircle className="w-4 h-4" /> },
-    upcoming: { bg: "bg-[#457B9D]", text: "Upcoming", icon: <Clock className="w-4 h-4" /> },
+    past: { bg: "bg-[#6B7280]", textKey: "completed", icon: <CheckCircle className="w-4 h-4" /> },
+    optimal: { bg: "bg-[#52B788]", textKey: "optimalNow", icon: <CheckCircle className="w-4 h-4" /> },
+    late: { bg: "bg-[#E9C46A]", textKey: "lateWindow", icon: <AlertCircle className="w-4 h-4" /> },
+    upcoming: { bg: "bg-[#457B9D]", textKey: "upcoming", icon: <Clock className="w-4 h-4" /> },
 };
 
 // Generate calendar view
@@ -107,7 +126,10 @@ const generateCalendarMonths = (crop: Crop) => {
 };
 
 export function SowingCalendar({ crop, district }: SowingCalendarProps) {
-    const sowingData = getSowingData(crop, district);
+    const { language } = useAgri();
+    const t = (key: any) => getTranslation(language, key);
+
+    const sowingData = getSowingData(crop, district, language);
     const config = statusConfig[sowingData.status];
     const calendarMonths = generateCalendarMonths(crop);
 
@@ -118,10 +140,10 @@ export function SowingCalendar({ crop, district }: SowingCalendarProps) {
                     <div className="p-2 bg-[#52B788]/10 rounded-lg">
                         <Calendar className="w-5 h-5 text-[#52B788]" />
                     </div>
-                    Optimal Sowing Window
+                    {t('optimalWindow')}
                     <Badge className={`ml-auto ${config.bg} text-white flex items-center gap-1`}>
                         {config.icon}
-                        {config.text}
+                        {t(config.textKey)}
                     </Badge>
                 </CardTitle>
             </CardHeader>
@@ -143,7 +165,7 @@ export function SowingCalendar({ crop, district }: SowingCalendarProps) {
                             {month.isCurrent && (
                                 <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1B4332] rounded-full" />
                             )}
-                            <p className="text-xs font-medium">{month.name}</p>
+                            <p className="text-xs font-medium">{t(month.name.toLowerCase())}</p>
                             {month.isOptimal && (
                                 <CheckCircle className="w-3 h-3 mx-auto mt-1" />
                             )}
@@ -153,28 +175,28 @@ export function SowingCalendar({ crop, district }: SowingCalendarProps) {
 
                 {/* Legend */}
                 <div className="flex flex-wrap justify-center gap-4 pt-2">
-                    <LegendItem color="bg-[#52B788]" label="Optimal Period" />
-                    <LegendItem color="bg-[#52B788]/20" label="Sowing Window" />
-                    <LegendItem color="bg-[#F3F4F6]" label="Off Season" />
+                    <LegendItem color="bg-[#52B788]" label={t('optimalPeriod')} />
+                    <LegendItem color="bg-[#52B788]/20" label={t('sowingWindow')} />
+                    <LegendItem color="bg-[#F3F4F6]" label={t('offSeason')} />
                 </div>
 
                 {/* Sowing Info Card */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-4 border-t border-[#E5E7EB]">
                     <InfoCard
                         icon={<Calendar className="w-4 h-4 text-[#1B4332]" />}
-                        label="Sowing Period"
+                        label={t('sowingPeriod')}
                         value={`${sowingData.startMonth} - ${sowingData.endMonth}`}
                     />
                     <InfoCard
                         icon={<CheckCircle className="w-4 h-4 text-[#52B788]" />}
-                        label="Optimal Dates"
+                        label={t('optimalDates')}
                         value={sowingData.optimalDates}
                         highlight
                     />
                     <InfoCard
                         icon={<Clock className="w-4 h-4 text-[#D4A373]" />}
-                        label="Crop Type"
-                        value={crop === "Wheat" ? "Rabi Season" : "Kharif Season"}
+                        label={t('cropType')}
+                        value={crop === "Wheat" ? t('rabi') : t('kharif')}
                     />
                 </div>
 
@@ -182,7 +204,7 @@ export function SowingCalendar({ crop, district }: SowingCalendarProps) {
                 <div className="p-4 bg-[#F8F9F1] rounded-lg border border-[#E5E7EB]">
                     <p className="text-xs text-[#6B7280] mb-1 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3" />
-                        Recommendation for {district}
+                        {t('recFor')} {district}
                     </p>
                     <p className="text-sm text-[#1F2937]">{sowingData.recommendation}</p>
                 </div>

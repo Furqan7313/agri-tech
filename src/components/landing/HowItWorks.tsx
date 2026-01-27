@@ -1,35 +1,40 @@
 "use client";
 
 import { UserPlus, Settings, LayoutDashboard } from "lucide-react";
-
-const steps = [
-    {
-        icon: <UserPlus className="w-5 h-5 text-primary" />,
-        title: "Create Account",
-        description: "Sign up in seconds. No credit card required."
-    },
-    {
-        icon: <Settings className="w-5 h-5 text-primary" />,
-        title: "Setup Farm Profile",
-        description: "Input your crop, location, and sowing date."
-    },
-    {
-        icon: <LayoutDashboard className="w-5 h-5 text-primary" />,
-        title: "Get Insights",
-        description: "Access your dashboard for live risk monitoring."
-    }
-];
+import { useAgri } from "@/context/AgriContext";
+import { getTranslation } from "@/lib/i18n";
 
 export function HowItWorks() {
+    const { language } = useAgri();
+    const t = (key: any) => getTranslation(language, key);
+
+    const steps = [
+        {
+            icon: <UserPlus className="w-5 h-5 text-primary" />,
+            title: t('createAccount'),
+            description: t('signupDesc')
+        },
+        {
+            icon: <Settings className="w-5 h-5 text-primary" />,
+            title: t('setupProfile'),
+            description: t('setupProfileDesc')
+        },
+        {
+            icon: <LayoutDashboard className="w-5 h-5 text-primary" />,
+            title: t('getInsights'),
+            description: t('getInsightsDesc')
+        }
+    ];
+
     return (
         <section className="py-24 bg-background">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-2xl mx-auto mb-16">
                     <h2 className="font-heading text-3xl font-bold text-foreground mb-4">
-                        How It Works
+                        {t('howItWorks')}
                     </h2>
                     <p className="text-muted-foreground">
-                        Three simple steps to start farming with data.
+                        {t('howItWorksDesc')}
                     </p>
                 </div>
 

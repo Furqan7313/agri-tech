@@ -7,6 +7,7 @@ export type Crop = string;
 export type Province = string;
 export type CropStage = string;
 export type FarmSize = string;
+export type Language = 'en' | 'ur';
 
 interface AgriState {
     district: District | null;
@@ -14,11 +15,13 @@ interface AgriState {
     province: Province | null;
     cropStage: CropStage | null;
     farmSize: FarmSize | null;
+    language: Language;
     setDistrict: (district: District) => void;
     setCrop: (crop: Crop) => void;
     setProvince: (province: Province) => void;
     setCropStage: (stage: CropStage) => void;
     setFarmSize: (size: FarmSize) => void;
+    setLanguage: (lang: Language) => void;
     isSelectionComplete: boolean;
 }
 
@@ -30,6 +33,7 @@ export function AgriProvider({ children }: { children: ReactNode }) {
     const [province, setProvince] = useState<Province | null>(null);
     const [cropStage, setCropStage] = useState<CropStage | null>(null);
     const [farmSize, setFarmSize] = useState<FarmSize | null>(null);
+    const [language, setLanguage] = useState<Language>('en');
     const [isLoaded, setIsLoaded] = useState(false);
 
     // Load from localStorage on mount
@@ -39,6 +43,10 @@ export function AgriProvider({ children }: { children: ReactNode }) {
         setProvince(localStorage.getItem('province'));
         setCropStage(localStorage.getItem('cropStage'));
         setFarmSize(localStorage.getItem('farmSize'));
+
+        const savedLang = localStorage.getItem('language') as Language;
+        if (savedLang) setLanguage(savedLang);
+
         setIsLoaded(true);
     }, []);
 
@@ -50,7 +58,8 @@ export function AgriProvider({ children }: { children: ReactNode }) {
         if (province) localStorage.setItem('province', province);
         if (cropStage) localStorage.setItem('cropStage', cropStage);
         if (farmSize) localStorage.setItem('farmSize', farmSize);
-    }, [district, crop, province, cropStage, farmSize, isLoaded]);
+        localStorage.setItem('language', language);
+    }, [district, crop, province, cropStage, farmSize, language, isLoaded]);
 
     const isSelectionComplete = isLoaded && district !== null && crop !== null && province !== null && cropStage !== null;
 
@@ -62,11 +71,13 @@ export function AgriProvider({ children }: { children: ReactNode }) {
                 province,
                 cropStage,
                 farmSize,
+                language,
                 setDistrict,
                 setCrop,
                 setProvince,
                 setCropStage,
                 setFarmSize,
+                setLanguage,
                 isSelectionComplete,
             }}
         >

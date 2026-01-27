@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Sprout, MapPin, Ruler } from "lucide-react";
+import { Loader2, Sprout, MapPin, Ruler, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -68,8 +68,18 @@ export default function ProfileSetupPage() {
         <div className="min-h-screen bg-muted/30 flex items-center justify-center p-4">
             <Card className="max-w-xl w-full border-primary/20 shadow-lg animate-fade-in-up">
                 <CardHeader className="text-center space-y-2">
-                    <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
-                        <Sprout className="w-6 h-6 text-primary" />
+                    <div className="relative">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute left-0 top-0 -ml-2 -mt-2 md:-ml-4 md:-mt-4"
+                            onClick={() => router.push("/dashboard")}
+                        >
+                            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+                        </Button>
+                        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-2">
+                            <Sprout className="w-6 h-6 text-primary" />
+                        </div>
                     </div>
                     <CardTitle className="text-2xl font-bold text-foreground font-heading">
                         Tell us about your farm

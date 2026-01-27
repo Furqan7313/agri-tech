@@ -12,10 +12,13 @@ import { IrrigationTimeline } from "@/components/dashboard/IrrigationTimeline";
 import { SowingCalendar } from "@/components/dashboard/SowingCalendar";
 import { ChatSidebar } from "@/components/chat/ChatSidebar";
 import { ChatButton } from "@/components/chat/ChatButton";
+import { getTranslation } from "@/lib/i18n";
 
 export default function DashboardPage() {
-    const { district, crop, isSelectionComplete } = useAgri();
+    const { district, crop, isSelectionComplete, language } = useAgri();
     const router = useRouter();
+
+    const t = (key: any) => getTranslation(language, key);
 
     useEffect(() => {
         // If loaded and not complete, redirect to setup
@@ -59,7 +62,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col items-center gap-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B4332]"></div>
                     <div className="animate-pulse text-[#1B4332] font-heading text-xl">
-                        Loading your farm data...
+                        {t('loading')}
                     </div>
                 </div>
             </div>
@@ -68,7 +71,7 @@ export default function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-[#F8F9F1]">
-            <DashboardHeader district={district!} crop={crop!} />
+            <DashboardHeader />
 
             <main className="container mx-auto px-4 py-6 lg:py-8">
                 {/* Section A: Farmer Snapshot */}
@@ -80,7 +83,7 @@ export default function DashboardPage() {
                     <div className="space-y-4">
                         <h2 className="font-heading text-xl font-semibold text-[#1B4332] flex items-center gap-2">
                             <span className="w-1 h-6 bg-[#D4A373] rounded-full"></span>
-                            Live Climate
+                            {t('liveClimate')}
                         </h2>
                         <LiveClimatePanel />
                     </div>
@@ -89,7 +92,7 @@ export default function DashboardPage() {
                     <div className="space-y-4">
                         <h2 className="font-heading text-xl font-semibold text-[#1B4332] flex items-center gap-2">
                             <span className="w-1 h-6 bg-[#E63946] rounded-full"></span>
-                            Risk Monitoring
+                            {t('riskMonitoring')}
                         </h2>
                         <RiskAssessmentPanel />
                     </div>
@@ -99,7 +102,7 @@ export default function DashboardPage() {
                 <section className="mb-8">
                     <h2 className="font-heading text-xl font-semibold text-[#1B4332] mb-4 flex items-center gap-2">
                         <span className="w-1 h-6 bg-[#52B788] rounded-full"></span>
-                        Action Plan
+                        {t('actionPlan')}
                     </h2>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <FertilizerCard crop={crop!} />
@@ -110,7 +113,7 @@ export default function DashboardPage() {
                 <section className="mb-8">
                     <h2 className="font-heading text-xl font-semibold text-[#1B4332] mb-4 flex items-center gap-2">
                         <span className="w-1 h-6 bg-[#1B4332] rounded-full"></span>
-                        Seasonal Guidance
+                        {t('seasonalGuidance')}
                     </h2>
                     <SowingCalendar crop={crop!} district={district!} />
                 </section>

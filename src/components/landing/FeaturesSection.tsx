@@ -2,40 +2,45 @@
 
 import { Shield, CloudRain, MessageSquare, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const features = [
-    {
-        icon: <Shield className="w-6 h-6 text-destructive" />,
-        title: "Risk Shield",
-        description: "Early warnings for diseases and pest outbreaks based on predictive models."
-    },
-    {
-        icon: <CloudRain className="w-6 h-6 text-blue-600" />,
-        title: "Precision Climate",
-        description: "Hyper-localized weather forecasts and irrigation plans for your farm."
-    },
-    {
-        icon: <MessageSquare className="w-6 h-6 text-green-600" />,
-        title: "AI Agronomist",
-        description: "Ask complex questions and get instant, evidence-backed answers in Urdu or English."
-    },
-    {
-        icon: <TrendingUp className="w-6 h-6 text-amber-600" />,
-        title: "Yield Maximization",
-        description: "Stage-specific fertilizer and care recommendations to ensure optional health."
-    }
-];
+import { useAgri } from "@/context/AgriContext";
+import { getTranslation } from "@/lib/i18n";
 
 export function FeaturesSection() {
+    const { language } = useAgri();
+    const t = (key: any) => getTranslation(language, key);
+
+    const features = [
+        {
+            icon: <Shield className="w-6 h-6 text-destructive" />,
+            title: t('riskShield'),
+            description: t('riskDesc')
+        },
+        {
+            icon: <CloudRain className="w-6 h-6 text-blue-600" />,
+            title: t('precisionClimate'),
+            description: t('climateDesc')
+        },
+        {
+            icon: <MessageSquare className="w-6 h-6 text-green-600" />,
+            title: t('aiAgronomist'),
+            description: t('aiDesc')
+        },
+        {
+            icon: <TrendingUp className="w-6 h-6 text-amber-600" />,
+            title: t('yieldMax'),
+            description: t('yieldDesc')
+        }
+    ];
+
     return (
         <section className="py-24 bg-[#F8F9F1]">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-2xl mx-auto mb-16">
                     <h2 className="font-heading text-3xl font-bold text-foreground mb-4">
-                        Intelligence for Every Acre
+                        {t('intelligenceTitle')}
                     </h2>
                     <p className="text-lg text-muted-foreground">
-                        ZaraiRadar combines satellite data and AI to help you farm smarter.
+                        {t('intelligenceDesc')}
                     </p>
                 </div>
 

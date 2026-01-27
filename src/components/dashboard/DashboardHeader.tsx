@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MapPin, Wheat, Settings, Sprout, Bell, Bug } from "lucide-react";
+import { Wheat, Settings, Sprout, Bell, Bug, BellOff, User, LogOut, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -11,22 +12,56 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { District, Crop } from "@/context/AgriContext";
+import { useAgri } from "@/context/AgriContext";
+import { EditDashboardSheet } from "./EditDashboardSheet";
+import { getTranslation } from "@/lib/i18n";
 
-interface DashboardHeaderProps {
-    district: District;
-    crop: Crop;
-}
 
-export function DashboardHeader({ district, crop }: DashboardHeaderProps) {
+export function DashboardHeader() {
     const router = useRouter();
+    const { language, setLanguage } = useAgri();
+    const t = (key: any) => getTranslation(language, key);
 
-    const handleChange = () => {
-        router.push("/");
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [hasUnread, setHasUnread] = useState(true);
+    const [notifications, setNotifications] = useState([
+        {
+            id: 1,
+            type: "risk",
+            title: "High Risk Disease Alert",
+            desc: "Leaf Curl Virus detected in your area.",
+            icon: Bug,
+            color: "text-destructive",
+            bg: "bg-destructive/10"
+        },
+        {
+            id: 2,
+            type: "weather",
+            title: "Weather Update",
+            desc: "Light rain expected tomorrow.",
+            icon: Wheat,
+            color: "text-secondary",
+            bg: "bg-secondary/10"
+        }
+    ]);
+
+    const handleOpenChange = (open: boolean) => {
+        if (open) {
+            setHasUnread(false);
+        }
+    };
+
+    const clearNotifications = () => {
+        setNotifications([]);
+    };
+
+    const handleSignOut = () => {
+        localStorage.removeItem("user_id");
+        router.push("/login");
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-white border-b border-[#E5E7EB] shadow-sm">
+        <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16 lg:h-20">
                     {/* Logo */}
@@ -39,82 +74,95 @@ export function DashboardHeader({ district, crop }: DashboardHeaderProps) {
                         </span>
                     </div>
 
-                    {/* Scope Anchor */}
-                    <div className="flex items-center gap-2 bg-[#F8F9F1] rounded-xl px-3 lg:px-4 py-2 border border-[#E5E7EB]">
-                        <div className="flex items-center gap-4 lg:gap-6">
-                            {/* Location */}
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-primary" />
-                                <div className="hidden sm:block">
-                                    <span className="text-xs text-muted-foreground">Location</span>
-                                    <p className="text-sm font-medium text-foreground">{district}</p>
-                                </div>
-                                <span className="sm:hidden text-sm font-medium text-[#1F2937]">{district}</span>
-                            </div>
-
-                            <div className="w-px h-8 bg-[#E5E7EB]" />
-
-                            {/* Crop */}
-                            <div className="flex items-center gap-2">
-                                <Wheat className="w-4 h-4 text-secondary" />
-                                <div className="hidden sm:block">
-                                    <span className="text-xs text-muted-foreground">Crop</span>
-                                    <p className="text-sm font-medium text-foreground">{crop}</p>
-                                </div>
-                                <span className="sm:hidden text-sm font-medium text-foreground">{crop}</span>
-                            </div>
-                        </div>
-
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleChange}
-                            className="ml-2 text-primary hover:text-primary-dark hover:bg-primary/5"
-                        >
-                            <Settings className="w-4 h-4 lg:mr-1" />
-                            <span className="hidden lg:inline">Change</span>
-                        </Button>
-                    </div>
-
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                        <DropdownMenu>
+                        <DropdownMenu onOpenChange={handleOpenChange}>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="relative cursor-pointer">
-                                    <Bell className="w-5 h-5 text-[#6B7280]" />
-                                    <span className="absolute top-1 right-1 w-2 h-2 bg-[#E63946] rounded-full animate-pulse" />
+                                <Button variant="ghost" size="icon" className="relative cursor-pointer hover:bg-muted/50 rounded-full">
+                                    <Bell className="w-5 h-5 text-muted-foreground" />
+                                    {hasUnread && notifications.length > 0 && (
+                                        <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-pulse" />
+                                    )}
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-80">
-                                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer">
-                                    <div className="flex items-start gap-2">
-                                        <div className="p-1 bg-red-100 rounded-full mt-1">
-                                            <Bug className="w-3 h-3 text-red-600" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-sm">High Risk Disease Alert</p>
-                                            <p className="text-xs text-gray-500">Leaf Curl Virus detected in your area.</p>
-                                        </div>
+                            <DropdownMenuContent align="end" className="w-80 rounded-xl shadow-lg border-gray-100">
+                                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+                                    <DropdownMenuLabel className="p-0 font-heading text-sm">{t('notifications')}</DropdownMenuLabel>
+                                    {notifications.length > 0 && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 text-[10px] text-muted-foreground hover:text-destructive px-2"
+                                            onClick={clearNotifications}
+                                        >
+                                            {t('clearAll')}
+                                        </Button>
+                                    )}
+                                </div>
+
+                                {notifications.length > 0 ? (
+                                    <div className="py-2">
+                                        {notifications.map((n) => (
+                                            <DropdownMenuItem key={n.id} className="cursor-pointer px-4 py-3 hover:bg-gray-50 focus:bg-gray-50 mx-1 rounded-lg">
+                                                <div className="flex items-start gap-3">
+                                                    <div className={`p-2 ${n.bg} rounded-full mt-0.5 shrink-0`}>
+                                                        <n.icon className={`w-4 h-4 ${n.color}`} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-sm text-gray-900 mb-0.5">{n.title}</p>
+                                                        <p className="text-xs text-gray-500 leading-snug">{n.desc}</p>
+                                                    </div>
+                                                </div>
+                                            </DropdownMenuItem>
+                                        ))}
                                     </div>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer">
-                                    <div className="flex items-start gap-2">
-                                        <div className="p-1 bg-yellow-100 rounded-full mt-1">
-                                            <Wheat className="w-3 h-3 text-yellow-600" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-sm">Weather Update</p>
-                                            <p className="text-xs text-gray-500">Light rain expected tomorrow.</p>
-                                        </div>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                                        <BellOff className="w-8 h-8 mb-3 opacity-20" />
+                                        <p className="text-sm">{t('noNotifications')}</p>
                                     </div>
-                                </DropdownMenuItem>
+                                )}
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        {/* Language Toggle - Moved to Header */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full"
+                            onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
+                            title={language === 'en' ? "Switch to Urdu" : "Switch to English"}
+                        >
+                            <Languages className="w-5 h-5" />
+                        </Button>
+
+                        {/* Edit Farm - Moved to Header */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full"
+                            onClick={() => setIsEditOpen(true)}
+                            title={t('editFarm')}
+                        >
+                            <Settings className="w-5 h-5" />
+                        </Button>
+
+                        <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block"></div>
+
+                        {/* Sign Out Button - Direct */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="relative cursor-pointer hover:bg-destructive/10 hover:text-destructive rounded-full"
+                            onClick={handleSignOut}
+                            title={t('signOut')}
+                        >
+                            <LogOut className="w-5 h-5" />
+                        </Button>
                     </div>
                 </div>
             </div>
+            <EditDashboardSheet open={isEditOpen} onOpenChange={setIsEditOpen} />
         </header>
     );
 }

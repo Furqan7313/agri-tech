@@ -3,15 +3,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Leaf, Phone } from "lucide-react";
+import { Eye, EyeOff, Loader2, Leaf, Phone, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockAuthService } from "@/lib/auth";
 
+import { useAgri } from "@/context/AgriContext";
+import { getTranslation } from "@/lib/i18n";
+
 export default function LoginPage() {
     const router = useRouter();
+    const { isSelectionComplete, language, setLanguage } = useAgri();
+    const t = (key: any) => getTranslation(language, key);
+
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [isPhoneLogin, setIsPhoneLogin] = useState(false);
@@ -42,7 +48,7 @@ export default function LoginPage() {
 
             localStorage.setItem("user_id", user.user_id);
 
-            if (user.is_profile_complete) {
+            if (user.is_profile_complete || isSelectionComplete) {
                 router.push("/dashboard");
             } else {
                 router.push("/setup");
@@ -55,119 +61,131 @@ export default function LoginPage() {
     };
 
     return (
-        <Card className="border-primary/20 shadow-lg animate-fade-in-up">
-            <CardHeader className="space-y-1 text-center">
-                <div className="flex justify-center mb-4">
-                    <div className="p-3 bg-primary/10 rounded-full">
-                        <Leaf className="w-8 h-8 text-primary" />
-                    </div>
-                </div>
-                <CardTitle className="text-2xl font-bold text-foreground">
-                    {isPhoneLogin ? "Phone Login" : "Welcome back"}
-                </CardTitle>
-                <CardDescription>
-                    {isPhoneLogin
-                        ? "We'll send a code to your phone"
-                        : "Enter your email to sign in to your account"
-                    }
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-                <form onSubmit={handleLogin} className="space-y-4">
-                    {isPhoneLogin ? (
-                        <div className="grid gap-2">
-                            <Label htmlFor="phone">Phone Number</Label>
-                            <div className="relative">
-                                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    type="tel"
-                                    placeholder="+92 300 1234567"
-                                    required
-                                    className="pl-9"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                />
-                            </div>
+        <div className="min-h-screen flex items-center justify-center p-4 relative">
+            <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4"
+                onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
+                title={language === 'en' ? "Switch to Urdu" : "Switch to English"}
+            >
+                <Languages className="w-5 h-5 text-muted-foreground" />
+            </Button>
+
+            <Card className="border-primary/20 shadow-lg animate-fade-in-up w-full max-w-md">
+                <CardHeader className="space-y-1 text-center">
+                    <div className="flex justify-center mb-4">
+                        <div className="p-3 bg-primary/10 rounded-full">
+                            <Leaf className="w-8 h-8 text-primary" />
                         </div>
-                    ) : (
-                        <>
+                    </div>
+                    <CardTitle className="text-2xl font-bold text-foreground">
+                        {isPhoneLogin ? t('phoneLogin') : t('welcomeBack')}
+                    </CardTitle>
+                    <CardDescription>
+                        {isPhoneLogin
+                            ? t('sendCodeToPhone')
+                            : t('enterEmailToSignIn')
+                        }
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4">
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        {isPhoneLogin ? (
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    placeholder="name@example.com"
-                                    required
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">Password</Label>
+                                <Label htmlFor="phone">{t('phoneNumber')}</Label>
                                 <div className="relative">
+                                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        id="password"
-                                        name="password"
-                                        type={showPassword ? "text" : "password"}
+                                        id="phone"
+                                        name="phone"
+                                        type="tel"
+                                        placeholder={t('enterPhone')}
                                         required
-                                        value={formData.password}
+                                        className="pl-9"
+                                        value={formData.phone}
                                         onChange={handleChange}
                                     />
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="h-4 w-4 text-muted-foreground" />
-                                        ) : (
-                                            <Eye className="h-4 w-4 text-muted-foreground" />
-                                        )}
-                                    </Button>
                                 </div>
                             </div>
-                        </>
-                    )}
+                        ) : (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">{t('email')}</Label>
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        placeholder={t('enterEmail')}
+                                        required
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="password">{t('password')}</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id="password"
+                                            name="password"
+                                            type={showPassword ? "text" : "password"}
+                                            required
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                            ) : (
+                                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
 
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" type="submit" disabled={isLoading}>
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isPhoneLogin ? "Send Verification Code" : "Sign In"}
+                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" type="submit" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isPhoneLogin ? t('sendVerificationCode') : t('signIn')}
+                        </Button>
+                    </form>
+
+                    <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-card px-2 text-muted-foreground">
+                                {t('orContinueWith')}
+                            </span>
+                        </div>
+                    </div>
+
+                    <Button
+                        variant="outline"
+                        type="button"
+                        disabled={isLoading}
+                        onClick={() => setIsPhoneLogin(!isPhoneLogin)}
+                    >
+                        {isPhoneLogin ? t('emailAndPassword') : t('phoneOtp')}
                     </Button>
-                </form>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
+                </CardContent>
+                <CardFooter className="flex flex-col gap-2">
+                    <div className="text-sm text-muted-foreground text-center">
+                        {t('dontHaveAccount')}{" "}
+                        <Link href="/signup" className="text-primary hover:underline hover:text-primary/80 font-medium">
+                            {t('signup')}
+                        </Link>
                     </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-card px-2 text-muted-foreground">
-                            Or continue with
-                        </span>
-                    </div>
-                </div>
-
-                <Button
-                    variant="outline"
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => setIsPhoneLogin(!isPhoneLogin)}
-                >
-                    {isPhoneLogin ? "Email & Password" : "Phone Number (OTP)"}
-                </Button>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-2">
-                <div className="text-sm text-muted-foreground text-center">
-                    Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-primary hover:underline hover:text-primary/80 font-medium">
-                        Sign up
-                    </Link>
-                </div>
-            </CardFooter>
-        </Card>
+                </CardFooter>
+            </Card>
+        </div>
     );
 }

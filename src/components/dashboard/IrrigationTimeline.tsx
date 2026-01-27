@@ -2,7 +2,8 @@
 
 import { Droplets, Sun, CloudRain } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crop } from "@/context/AgriContext";
+import { Crop, useAgri } from "@/context/AgriContext";
+import { getTranslation } from "@/lib/i18n";
 
 interface IrrigationTimelineProps {
     crop: Crop;
@@ -14,7 +15,7 @@ interface DayData {
     day: string;
     date: number;
     status: DayStatus;
-    label: string;
+    labelKey: string;
 }
 
 // Simulated weekly irrigation schedule
@@ -40,7 +41,7 @@ const getIrrigationSchedule = (crop: Crop): DayData[] => {
             day: dayName,
             date: dateNum,
             status,
-            label: status === "water" ? "Irrigate" : status === "rain" ? "Rain" : "Rest"
+            labelKey: status === "water" ? "irrigate" : status === "rain" ? "rain" : "rest"
         });
     }
     return schedule;
@@ -68,7 +69,17 @@ const statusConfig: Record<DayStatus, { icon: React.ReactNode; bg: string; iconC
 };
 
 export function IrrigationTimeline({ crop }: IrrigationTimelineProps) {
+    const { language } = useAgri();
+    const t = (key: any) => getTranslation(language, key);
     const schedule = getIrrigationSchedule(crop);
+
+    const recommendedText = language === 'ur'
+        ? "مشورہ: صبح کی آبپاشی، 2-3 انچ گہرائی"
+        : "Recommended: Morning irrigation, 2-3 inches depth";
+
+    const nextWaterText = language === 'ur'
+        ? "اگلا پانی: آج"
+        : "Next Water: Today";
 
     return (
         <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300">
@@ -77,7 +88,7 @@ export function IrrigationTimeline({ crop }: IrrigationTimelineProps) {
                     <div className="p-2 bg-agri-info/10 rounded-lg">
                         <Droplets className="w-5 h-5 text-agri-info" />
                     </div>
-                    Weekly Irrigation Plan
+                    {t('weeklyPlan')}
                     {/* Dynamic date range could be added here if needed */}
                 </CardTitle>
             </CardHeader>
@@ -100,7 +111,7 @@ export function IrrigationTimeline({ crop }: IrrigationTimelineProps) {
                             >
                                 {isToday && (
                                     <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-primary text-primary-foreground text-[10px] rounded-full font-medium">
-                                        Today
+                                        {t('today')}
                                     </span>
                                 )}
                                 <p className="text-xs text-[#6B7280] font-medium">{day.day}</p>
@@ -115,9 +126,9 @@ export function IrrigationTimeline({ crop }: IrrigationTimelineProps) {
 
                 {/* Legend */}
                 <div className="flex flex-wrap justify-center gap-4 mt-4 pt-4 border-t border-border">
-                    <LegendItem icon={<Droplets className="w-4 h-4 text-agri-info" />} label="Irrigate" />
-                    <LegendItem icon={<Sun className="w-4 h-4 text-secondary" />} label="Rest Day" />
-                    <LegendItem icon={<CloudRain className="w-4 h-4 text-agri-success" />} label="Rain Expected" />
+                    <LegendItem icon={<Droplets className="w-4 h-4 text-agri-info" />} label={t('irrigate')} />
+                    <LegendItem icon={<Sun className="w-4 h-4 text-secondary" />} label={t('restDay')} />
+                    <LegendItem icon={<CloudRain className="w-4 h-4 text-agri-success" />} label={t('rainExpected')} />
                 </div>
 
                 {/* Next Irrigation Info */}
@@ -126,8 +137,8 @@ export function IrrigationTimeline({ crop }: IrrigationTimelineProps) {
                         <Droplets className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-foreground">Next Water: Today</p>
-                        <p className="text-xs text-muted-foreground">Recommended: Morning irrigation, 2-3 inches depth</p>
+                        <p className="text-sm font-medium text-foreground">{nextWaterText}</p>
+                        <p className="text-xs text-muted-foreground">{recommendedText}</p>
                     </div>
                 </div>
             </CardContent>
