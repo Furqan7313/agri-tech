@@ -8,32 +8,40 @@ export function Footer() {
     const { language } = useAgri();
     const t = (key: any) => getTranslation(language, key);
 
+
     return (
-        <footer className="bg-[#064e3b] text-white pt-16 pb-8">
-            <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 lg:gap-12 mb-12">
-                    {/* Brand */}
-                    <div className="md:col-span-2">
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="p-2 bg-white/10 rounded-lg">
-                                <Sprout className="w-6 h-6 text-[#4ade80]" />
+        <footer className="bg-[#0F3D2E] text-white pt-24 pb-12 relative overflow-hidden font-sans">
+            {/* Background Gradient Mesh */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-[#1F7A5A]/30 rounded-full blur-3xl opacity-50"></div>
+                <div className="absolute bottom-[-10%] left-[-5%] w-72 h-72 bg-[#1F7A5A]/20 rounded-full blur-3xl opacity-40"></div>
+            </div>
+
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
+                    {/* Brand & Approx 4 cols */}
+                    <div className="lg:col-span-5">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="p-2.5 bg-gradient-to-br from-[#1F7A5A] to-[#0F3D2E] rounded-xl shadow-lg border border-[#34D399]/20">
+                                <Sprout className="w-6 h-6 text-white" />
                             </div>
-                            <span className="font-heading text-2xl font-bold">ZaraiRadar</span>
+                            <span className="font-heading text-2xl font-bold tracking-tight text-white">ZaraiRadar</span>
                         </div>
-                        <p className="text-gray-400 text-sm leading-relaxed max-w-md mb-6">
-                            {t('footerDesc')}
+                        <p className="text-emerald-100/70 text-base leading-relaxed max-w-sm mb-8">
+                            {t('footerDesc') || "Empowering farmers with AI-driven insights for a sustainable and profitable future. Join the revolution in smart agriculture."}
                         </p>
-                        <div className="flex gap-4">
-                            <SocialIcon icon={<Facebook className="w-5 h-5" />} />
-                            <SocialIcon icon={<Twitter className="w-5 h-5" />} />
-                            <SocialIcon icon={<Linkedin className="w-5 h-5" />} />
-                            <SocialIcon icon={<Instagram className="w-5 h-5" />} />
+
+                        <div className="flex gap-3">
+                            <SocialIcon href="https://facebook.com" icon={<Facebook className="w-5 h-5" />} />
+                            <SocialIcon href="https://twitter.com" icon={<Twitter className="w-5 h-5" />} />
+                            <SocialIcon href="https://linkedin.com" icon={<Linkedin className="w-5 h-5" />} />
+                            <SocialIcon href="https://instagram.com" icon={<Instagram className="w-5 h-5" />} />
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h4 className="font-heading font-semibold text-white mb-6">{t('platform')}</h4>
+                    {/* Quick Links - 3 cols */}
+                    <div className="lg:col-span-3">
+                        <h4 className="font-bold text-white text-lg mb-6">{t('platform')}</h4>
                         <ul className="space-y-4">
                             <FooterLink label={t('riskAssessment')} />
                             <FooterLink label={t('weatherUpdate')} />
@@ -42,34 +50,41 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Contact */}
-                    <div>
-                        <h4 className="font-heading font-semibold text-white mb-6">{t('contactUs')}</h4>
-                        <ul className="space-y-4">
-                            <li className="flex items-start gap-3 text-gray-400 text-sm">
-                                <MapPin className="w-5 h-5 text-[#4ade80] shrink-0" />
-                                <span>{t('address')}</span>
+                    {/* Contact & Newsletter - 4 cols */}
+                    <div className="lg:col-span-4">
+                        <h4 className="font-bold text-white text-lg mb-6">{t('contactUs')}</h4>
+                        <ul className="space-y-5 mb-8">
+                            <li className="flex items-start gap-4 text-emerald-100/80 group">
+                                <div className="p-2 bg-white/5 rounded-full group-hover:bg-[#1F7A5A] transition-colors duration-300">
+                                    <MapPin className="w-4 h-4 text-[#34D399] group-hover:text-white" />
+                                </div>
+                                <span className="text-sm leading-relaxed mt-1">{t('address')}</span>
                             </li>
-                            <li className="flex items-center gap-3 text-gray-400 text-sm">
-                                <Phone className="w-5 h-5 text-[#4ade80] shrink-0" />
-                                <span>+92 300 1234567</span>
+                            <li className="flex items-center gap-4 text-emerald-100/80 group">
+                                <div className="p-2 bg-white/5 rounded-full group-hover:bg-[#1F7A5A] transition-colors duration-300">
+                                    <Phone className="w-4 h-4 text-[#34D399] group-hover:text-white" />
+                                </div>
+                                <span className="text-sm">+92 317 8807313</span>
                             </li>
-                            <li className="flex items-center gap-3 text-gray-400 text-sm">
-                                <Mail className="w-5 h-5 text-[#4ade80] shrink-0" />
-                                <span>support@zarairadar.com</span>
+                            <li className="flex items-center gap-4 text-emerald-100/80 group">
+                                <div className="p-2 bg-white/5 rounded-full group-hover:bg-[#1F7A5A] transition-colors duration-300">
+                                    <Mail className="w-4 h-4 text-[#34D399] group-hover:text-white" />
+                                </div>
+                                <span className="text-sm">support@zarairadar.com</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-gray-500 text-sm">
+                <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+                    <p className="text-emerald-100/40 text-sm font-medium">
                         © 2026 {t('rightsReserved')}
                     </p>
-                    <div className="flex items-center gap-6">
-                        <a href="#" className="text-gray-500 hover:text-white text-sm transition-colors">Privacy Policy</a>
-                        <a href="#" className="text-gray-500 hover:text-white text-sm transition-colors">Terms of Service</a>
+                    <div className="flex items-center gap-8">
+                        <a href="#" className="text-emerald-100/60 hover:text-[#34D399] text-sm transition-colors duration-300">Privacy Policy</a>
+                        <a href="#" className="text-emerald-100/60 hover:text-[#34D399] text-sm transition-colors duration-300">Terms of Service</a>
+                        <a href="#" className="text-emerald-100/60 hover:text-[#34D399] text-sm transition-colors duration-300">Cookie Settings</a>
                     </div>
                 </div>
             </div>
@@ -77,9 +92,14 @@ export function Footer() {
     );
 }
 
-function SocialIcon({ icon }: { icon: React.ReactNode }) {
+function SocialIcon({ icon, href }: { icon: React.ReactNode, href: string }) {
     return (
-        <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-[#4ade80] hover:text-[#0f172a] transition-all duration-300 text-gray-400">
+        <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full hover:bg-[#1F7A5A] hover:text-white border border-white/5 hover:border-[#34D399]/30 transition-all duration-300 text-emerald-100/70 hover:scale-110 shadow-sm"
+        >
             {icon}
         </a>
     )
@@ -88,8 +108,9 @@ function SocialIcon({ icon }: { icon: React.ReactNode }) {
 function FooterLink({ label }: { label: string }) {
     return (
         <li>
-            <a href="#" className="text-gray-400 hover:text-[#4ade80] transition-colors text-sm font-medium">
-                {label}
+            <a href="#" className="text-emerald-100/70 hover:text-white transition-all duration-300 text-sm font-medium flex items-center gap-2 group">
+                <span className="w-0 h-0.5 bg-[#34D399] group-hover:w-3 transition-all duration-300 rounded-full"></span>
+                <span className="group-hover:translate-x-1 transition-transform duration-300">{label}</span>
             </a>
         </li>
     )

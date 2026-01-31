@@ -176,4 +176,12 @@
 }
 .animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
 
+@keyframes infinite-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+.animate-infinite-scroll {
+  animation: infinite-scroll 65s linear infinite;
+}
+
 .text-balance { text-wrap: balance; }

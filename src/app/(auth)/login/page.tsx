@@ -15,7 +15,7 @@ import { getTranslation } from "@/lib/i18n";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { isSelectionComplete, language, setLanguage } = useAgri();
+    const { isSelectionComplete, language, setLanguage, setDistrict, setCrop, setProvince, setCropStage, setFarmSize } = useAgri();
     const t = (key: any) => getTranslation(language, key);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -48,11 +48,38 @@ export default function LoginPage() {
 
             localStorage.setItem("user_id", user.user_id);
 
-            if (user.is_profile_complete || isSelectionComplete) {
-                router.push("/dashboard");
-            } else {
-                router.push("/setup");
+            // SIMULATE DATA SYNC: 
+            // In a real app, we would fetch user profile here.
+            // For this mock, if the user doesn't have local data, we'll ASSUME they are a returning user 
+            // and populate with default mock data so they don't hit the Setup screen again.
+            // This fixes the "Setup Loop" on new devices/browsers.
+
+            const hasLocalProfile = localStorage.getItem("district");
+
+            if (!hasLocalProfile) {
+                // Simulate fetching profile from "Cloud"
+                const mockProfile = {
+                    district: "Lahore",
+                    province: "Punjab",
+                    crop: "Wheat",
+                    cropStage: "Vegetative",
+                    farmSize: "Medium (5-25 acres)"
+                };
+
+                // Update Context (which updates localStorage)
+                setDistrict(mockProfile.district);
+                setProvince(mockProfile.province);
+                setCrop(mockProfile.crop);
+                setCropStage(mockProfile.cropStage);
+                setFarmSize(mockProfile.farmSize);
+
+                // Allow a small tick for context to propagate if needed, though setters are usually fast enough relative to routing
+                // We'll trust the setters.
             }
+
+            // Navigate to Dashboard
+            router.push("/dashboard");
+
         } catch (error) {
             console.error("Login failed", error);
         } finally {

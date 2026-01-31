@@ -15,48 +15,27 @@ import { ChatButton } from "@/components/chat/ChatButton";
 import { getTranslation } from "@/lib/i18n";
 
 export default function DashboardPage() {
-    const { district, crop, isSelectionComplete, language } = useAgri();
+    const { district, crop, isSelectionComplete, language, isLoaded } = useAgri();
     const router = useRouter();
 
     const t = (key: any) => getTranslation(language, key);
 
     useEffect(() => {
-        // If loaded and not complete, redirect to setup
-        // We check against explicit false to avoid redirecting during loading state (if isSelectionComplete is false during load)
-        // But isSelectionComplete is (isLoaded && ...). So if not loaded, it is false.
-        // We should wait until loaded.
-        // For MVP, we'll assume if it's not complete after mount, we redirect.
-        // But since we use "isLoaded" inside context, we can't easily access "isLoaded" here unless we expose it.
-        // However, checking for district/crop nullity is enough.
+        if (!isLoaded) return;
 
-        // Actually, if we are here, we might be loading.
-        // We can just show loading state until we are sure.
-    }, [isSelectionComplete, router]);
-
-    // Better redirection logic handled in render or a separate effect with a timeout or an exposed isLoaded flag.
-    // Given the context implementation: 
-    // const isSelectionComplete = isLoaded && ...
-    // So if isSelectionComplete is false, it might be loading OR it might be missing data.
-    // We should probably expose `isLoaded` from context to be precise.
-    // For now, I'll rely on the existing "Loading" UI if !isSelectionComplete, but add a timeout or check localStorage directly if needed.
-    // Or just trust the flow. If user lands here, they expect to see dashboard or be redirected.
-
-    // Simplest MVP hack: only redirect if we are SURE it's empty.
-    // But since context runs on client, it will be null initially.
-    // Let's just show Loading... until it hydrates.
-
-    // We can check if localStorage is empty to redirect immediately.
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const hasData = localStorage.getItem('district');
-            if (!hasData) {
-                router.push("/setup");
-            }
+        const userId = localStorage.getItem("user_id");
+        if (!userId) {
+            router.push("/signup");
+            return;
         }
-    }, [router]);
+
+        if (userId && !isSelectionComplete) {
+            router.push("/setup");
+        }
+    }, [isLoaded, isSelectionComplete, router]);
 
 
-    if (!isSelectionComplete) {
+    if (!isLoaded || !isSelectionComplete) {
         return (
             <div className="min-h-screen bg-[#F8F9F1] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">

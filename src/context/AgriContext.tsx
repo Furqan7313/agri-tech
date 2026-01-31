@@ -23,6 +23,7 @@ interface AgriState {
     setFarmSize: (size: FarmSize) => void;
     setLanguage: (lang: Language) => void;
     isSelectionComplete: boolean;
+    isLoaded: boolean;
 }
 
 const AgriContext = createContext<AgriState | undefined>(undefined);
@@ -79,6 +80,7 @@ export function AgriProvider({ children }: { children: ReactNode }) {
                 setFarmSize,
                 setLanguage,
                 isSelectionComplete,
+                isLoaded,
             }}
         >
             {children}

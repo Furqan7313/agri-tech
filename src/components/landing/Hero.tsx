@@ -1,13 +1,10 @@
 "use client";
 
-import { Sprout, TrendingUp, Shield, BarChart3, ArrowRight, Menu, Languages } from "lucide-react";
+import * as React from "react";
+import { Menu, Globe, Shield, Activity, TrendingUp, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-    Sheet,
-    SheetContent,
-    SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useAgri } from "@/context/AgriContext";
 import { getTranslation } from "@/lib/i18n";
 
@@ -16,146 +13,128 @@ export function Hero() {
     const t = (key: any) => getTranslation(language, key);
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#1B4332] to-[#2D6A4F] py-20 lg:py-32 flex items-center min-h-[85vh]">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="1" />
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
+        <section className="relative w-full min-h-screen overflow-hidden flex flex-col">
+            {/* Background Image */}
+            <div className="absolute inset-0 z-0">
+                <img
+                    src="/final-bg.png?t=99"
+                    alt="Agriculture Background"
+                    className="w-full h-full object-cover object-bottom"
+                />
+                {/* Overlay for readability */}
+                <div className="absolute inset-0 bg-black/30" />
             </div>
 
-            {/* Floating Elements */}
-            <div className="absolute top-20 left-10 w-20 h-20 bg-[#52B788]/20 rounded-full blur-2xl animate-pulse" />
-            <div className="absolute bottom-20 right-10 w-32 h-32 bg-[#D4A373]/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "1s" }} />
-
             {/* Navbar */}
-            <nav className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-50">
-                <div className="flex items-center gap-2">
-                    <span className="font-heading text-2xl font-bold text-white tracking-tight">ZaraiRadar</span>
+            <nav className="absolute top-0 w-full flex items-center justify-between px-6 py-1 z-50">
+                {/* Logo Left */}
+                <div className="flex items-center">
+                    <img src="/logo-transparent.png" alt="ZaraiRadar" className="h-20 sm:h-24 md:h-32 w-auto" />
                 </div>
 
-                {/* Desktop Nav */}
-                <div className="hidden md:flex items-center gap-4">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-white hover:bg-white/10 mr-1"
-                        onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
-                        title={language === 'en' ? "Switch to Urdu" : "Switch to English"}
-                    >
-                        <Languages className="w-5 h-5" />
-                    </Button>
-                    <Link href="/login">
-                        <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10">
-                            {t('login')}
-                        </Button>
+                {/* Desktop Nav Right */}
+                <div className="hidden md:flex items-center gap-6">
+                    <Link href="/login" className="text-white font-medium hover:text-emerald-400 transition-colors">
+                        {t("login")}
                     </Link>
                     <Link href="/signup">
-                        <Button className="bg-white text-[#1B4332] hover:bg-gray-100 font-semibold shadow-md">
-                            {t('signup')}
+                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 rounded-md font-bold transition-all shadow-md">
+                            {t("signup")}
                         </Button>
                     </Link>
-                </div>
-
-                {/* Mobile Nav */}
-                <div className="md:hidden flex items-center gap-2">
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="text-white hover:bg-white/10"
-                        onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
+                        className="text-white hover:bg-white/10 rounded-full"
+                        onClick={() => setLanguage(language === "en" ? "ur" : "en")}
                     >
-                        <Languages className="w-5 h-5" />
+                        <Globe className="w-6 h-6" />
                     </Button>
+                </div>
+
+                {/* Mobile Menu */}
+                <div className="md:hidden">
                     <Sheet>
                         <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-                                <Menu className="w-6 h-6" />
+                            <Button variant="ghost" size="icon" className="text-white">
+                                <Menu className="w-7 h-7" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right">
+                        <SheetContent>
+                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                             <div className="flex flex-col gap-4 mt-8">
-                                <Link href="/login" className="w-full">
-                                    <Button variant="outline" className="w-full justify-start">
-                                        {t('login')}
+                                <Link href="/login">
+                                    <Button variant="ghost" className="w-full justify-start text-lg">
+                                        {t("login")}
                                     </Button>
                                 </Link>
-                                <Link href="/signup" className="w-full">
-                                    <Button className="w-full justify-start bg-primary text-primary-foreground">
-                                        {t('createAccount')}
+                                <Link href="/signup">
+                                    <Button className="w-full bg-emerald-600 text-white">
+                                        {t("signup")}
                                     </Button>
                                 </Link>
+                                <Button
+                                    variant="ghost"
+                                    className="justify-start text-lg"
+                                    onClick={() => setLanguage(language === "en" ? "ur" : "en")}
+                                >
+                                    <Globe className="mr-2" />
+                                    {language === "en" ? "Urdu" : "English"}
+                                </Button>
                             </div>
                         </SheetContent>
                     </Sheet>
                 </div>
             </nav>
 
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="max-w-4xl mx-auto text-center mt-8">
-                    {/* Badge */}
-                    <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-2 mb-8 animate-fade-in-up">
-                        <Sprout className="w-4 h-4 text-[#52B788]" />
-                        <span className="text-white/90 text-sm font-medium">{t('poweredBy')}</span>
-                    </div>
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-32 relative z-10">
+                <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-tight drop-shadow-lg">
+                    AI-Powered Farming
+                    <br />
+                    <span className="text-emerald-400">for Punjab’s Fields</span>
+                </h1>
 
-                    {/* Main Heading */}
-                    <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight animate-fade-in-up [animation-delay:100ms]">
-                        {t('heroTitle')} <br />
-                        <span className="text-[#52B788]">{t('forPunjab')}</span>
-                    </h1>
+                {/* Separator Line */}
+                <div className="w-full max-w-2xl h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6"></div>
 
-                    {/* Subheading */}
-                    <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-12 animate-fade-in-up [animation-delay:200ms] leading-relaxed">
-                        {t('heroDesc')}
-                    </p>
+                <p className="max-w-3xl text-lg sm:text-xl text-white/90 font-medium drop-shadow-md mb-10">
+                    Real-time weather, disease alerts, and crop guidance—tailored to your land.
+                </p>
 
-                    {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up [animation-delay:300ms] mb-16">
-                        <Link href="/signup" className="w-full sm:w-auto">
-                            <Button size="lg" className="w-full sm:w-auto bg-[#52B788] hover:bg-[#40916c] text-[#1B4332] font-bold text-base h-12 px-8 shadow-lg shadow-[#52B788]/20">
-                                {t('getStartedFree')}
-                                <ArrowRight className={`ml-2 w-5 h-5 ${language === 'ur' ? 'rotate-180' : ''}`} />
-                            </Button>
-                        </Link>
-                        <Link href="/login" className="w-full sm:w-auto">
-                            <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 bg-transparent h-12 px-8">
-                                {t('existingUser')}
-                            </Button>
-                        </Link>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-3xl mx-auto animate-fade-in-up [animation-delay:400ms]">
-                        <StatCard icon={<BarChart3 className="w-5 h-5" />} value="98%" label={t('accuracyRate')} />
-                        <StatCard icon={<Shield className="w-5 h-5" />} value="24/7" label={t('monitoring')} />
-                        <StatCard icon={<TrendingUp className="w-5 h-5" />} value="15%" label={t('yieldIncrease')} />
-                        <StatCard icon={<Sprout className="w-5 h-5" />} value="3" label={t('districts')} />
-                    </div>
-                </div>
+                <Link href="/signup">
+                    <Button
+                        size="lg"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-7 text-xl rounded-md shadow-2xl transition-transform hover:scale-105"
+                    >
+                        Get Started Free
+                    </Button>
+                </Link>
             </div>
 
-            {/* Bottom Wave - Exactly as requested */}
-            <div className="absolute bottom-[-1px] left-0 right-0">
-                <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto block" preserveAspectRatio="none">
-                    <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#F8F9F1" />
-                </svg>
+            {/* Stats Cards - Bottom */}
+            <div className="absolute bottom-10 w-full px-4 z-20">
+                <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    <StatCard icon={Shield} value="98%" label="Accuracy" />
+                    <StatCard icon={Activity} value="24/7" label="Monitoring" />
+                    <StatCard icon={TrendingUp} value="30%" label="Higher Yield" />
+                    <StatCard icon={MapPin} value="25+" label="Districts" />
+                </div>
             </div>
         </section>
     );
 }
 
-function StatCard({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+function StatCard({ icon: Icon, value, label }: any) {
     return (
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center hover:bg-white/15 transition-all duration-300">
-            <div className="flex justify-center mb-2 text-[#52B788]">{icon}</div>
-            <div className="text-2xl font-bold text-white font-heading">{value}</div>
-            <div className="text-sm text-white/70">{label}</div>
+        <div className="bg-black/50 backdrop-blur-md rounded-xl p-4 flex items-center gap-4 text-left border border-white/10 shadow-lg group hover:bg-black/60 transition-colors">
+            <div className="p-2 sm:p-3 bg-white/10 rounded-full">
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div>
+                <div className="text-xl sm:text-2xl font-bold text-white">{value}</div>
+                <div className="text-xs sm:text-sm text-white/80">{label}</div>
+            </div>
         </div>
     );
 }
