@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Wheat, Settings, Sprout, Bell, Bug, BellOff, User, LogOut, Languages } from "lucide-react";
+import { Wheat, Settings, Sprout, Bell, Bug, BellOff, User, LogOut, Languages, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -24,6 +24,11 @@ export function DashboardHeader() {
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [hasUnread, setHasUnread] = useState(true);
+    const [username, setUsername] = useState<string>("");
+
+    useEffect(() => {
+        setUsername(localStorage.getItem("username") || "Profile");
+    }, []);
     const [notifications, setNotifications] = useState([
         {
             id: 1,
@@ -56,7 +61,10 @@ export function DashboardHeader() {
     };
 
     const handleSignOut = () => {
+        localStorage.removeItem("access_token");
         localStorage.removeItem("user_id");
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("username");
         router.push("/login");
     };
 
@@ -125,7 +133,7 @@ export function DashboardHeader() {
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {/* Language Toggle - Moved to Header */}
+                        {/* Language Toggle */}
                         <Button
                             variant="ghost"
                             size="icon"
@@ -136,29 +144,48 @@ export function DashboardHeader() {
                             <Languages className="w-5 h-5" />
                         </Button>
 
-                        {/* Edit Farm - Moved to Header */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full"
-                            onClick={() => setIsEditOpen(true)}
-                            title={t('editFarm')}
-                        >
-                            <Settings className="w-5 h-5" />
-                        </Button>
-
                         <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block"></div>
 
-                        {/* Sign Out Button - Direct */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="relative cursor-pointer hover:bg-destructive/10 hover:text-destructive rounded-full"
-                            onClick={handleSignOut}
-                            title={t('signOut')}
-                        >
-                            <LogOut className="w-5 h-5" />
-                        </Button>
+                        {/* Profile dropdown: username, Settings, Log out */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className="gap-2 pl-2 pr-3 h-9 rounded-full hover:bg-muted/50"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                        <User className="w-4 h-4 text-primary" />
+                                    </div>
+                                    <span className="font-medium text-sm text-foreground max-w-[120px] truncate hidden sm:inline">
+                                        {username}
+                                    </span>
+                                    <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-lg border-gray-100">
+                                <DropdownMenuLabel className="font-normal">
+                                    <div className="flex flex-col gap-0.5">
+                                        <p className="text-xs text-muted-foreground">{t('profile') || "Profile"}</p>
+                                        <p className="font-semibold text-foreground truncate">{username}</p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    className="cursor-pointer"
+                                    onClick={() => setIsEditOpen(true)}
+                                >
+                                    <Settings className="w-4 h-4 mr-2" />
+                                    {t('settings') || t('editFarm') || "Settings"}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="cursor-pointer text-destructive focus:text-destructive"
+                                    onClick={handleSignOut}
+                                >
+                                    <LogOut className="w-4 h-4 mr-2" />
+                                    {t('signOut') || "Log out"}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             </div>

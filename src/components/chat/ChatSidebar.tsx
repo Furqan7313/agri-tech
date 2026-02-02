@@ -22,30 +22,14 @@ import {
 import { useChat, Message } from "@/context/ChatContext";
 import { useAgri } from "@/context/AgriContext";
 
-// Quick action responses
-const quickActionResponses: Record<string, { content: string; source: string }> = {
-    "Show NPK Plan": {
-        content:
-            "Based on your crop selection, here's the recommended NPK ratio:\n\n🌿 Nitrogen (N): 120 kg/acre\n🏔️ Phosphorus (P): 60 kg/acre\n💧 Potassium (K): 40 kg/acre\n\nApply nitrogen in split doses - 50% at sowing and 50% at tillering stage for optimal absorption.",
-        source: "Soil Atlas 2023",
-    },
-    "Check Weather Risk": {
-        content:
-            "Current weather assessment for your area:\n\n🌡️ Temperature: 28°C (Favorable)\n💧 Humidity: 65% (Moderate)\n💨 Wind: 12 km/h (Light)\n\n⚠️ Risk Level: Low-Moderate\n\nNo immediate weather threats detected. Continue normal irrigation schedule. Monitor for temperature changes in the next 48 hours.",
-        source: "PMD Forecast 2026",
-    },
-    "Disease Treatment": {
-        content:
-            "Active disease alert: Yellow Rust\n\n🔍 Symptoms to watch:\n• Yellow-orange pustules on leaves\n• Striped pattern along veins\n\n💊 Treatment Protocol:\n1. Apply Propiconazole fungicide (0.1%) within 48 hours\n2. Ensure proper drainage to reduce humidity\n3. Scout fields every 3 days for spread\n\nPrevention: Consider resistant varieties for next season.",
-        source: "FAO Plant Health Guide",
-    },
-};
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export function ChatSidebar() {
-    const { messages, isOpen, setIsOpen, addMessage } = useChat();
+    const { messages, isOpen, setIsOpen, addMessage, sessionId, setSessionId } = useChat();
     const { district, crop } = useAgri();
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -59,27 +43,48 @@ export function ChatSidebar() {
     const handleSendMessage = async (content: string) => {
         if (!content.trim()) return;
 
-        // Add user message
         addMessage(content, "user");
         setInputValue("");
         setIsTyping(true);
+        setError(null);
 
-        // Simulate AI response delay
-        await new Promise((resolve) => setTimeout(resolve, 1000 + Math.random() * 1000));
+        const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-        // Check if it's a quick action
-        const quickResponse = quickActionResponses[content];
-        if (quickResponse) {
-            addMessage(quickResponse.content, "assistant", quickResponse.source);
-        } else {
-            // Generic response
-            addMessage(
-                `Thank you for your question about "${content}". Based on your context (${district}, ${crop}), I recommend checking the dashboard for detailed insights. Is there anything specific you'd like to know about weather, fertilizers, or disease management?`,
-                "assistant",
-                "AgriTech AI"
-            );
+        try {
+            const res = await fetch(`${API_BASE}/chat/conversation`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({
+                    query: content.trim(),
+                    session_id: sessionId || undefined,
+                }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+                const msg = data.detail || data.message || "Failed to get response";
+                addMessage(
+                    `Sorry, I couldn't process that. ${typeof msg === "string" ? msg : JSON.stringify(msg)}`,
+                    "assistant",
+                    "Error"
+                );
+                setError(typeof msg === "string" ? msg : "Request failed");
+                return;
+            }
+
+            if (data.session_id) setSessionId(data.session_id);
+            addMessage(data.answer || "No response.", "assistant", data.source || "Zarai Radar RAG");
+        } catch (e) {
+            const msg = e instanceof Error ? e.message : "Network error";
+            addMessage(`Sorry, something went wrong. ${msg}`, "assistant", "Error");
+            setError(msg);
+        } finally {
+            setIsTyping(false);
         }
-        setIsTyping(false);
     };
 
     const handleQuickAction = (action: string) => {
@@ -119,6 +124,12 @@ export function ChatSidebar() {
                             Context: <span className="font-medium text-primary">{district}</span> •{" "}
                             <span className="font-medium text-secondary">{crop}</span>
                         </p>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="mx-4 mt-2 py-2 px-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+                        {error}
                     </div>
                 )}
 

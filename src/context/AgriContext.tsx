@@ -37,18 +37,21 @@ export function AgriProvider({ children }: { children: ReactNode }) {
     const [language, setLanguage] = useState<Language>('en');
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Load from localStorage on mount
+    // Load from localStorage on mount (client-only so we never block forever)
     React.useEffect(() => {
-        setDistrict(localStorage.getItem('district'));
-        setCrop(localStorage.getItem('crop'));
-        setProvince(localStorage.getItem('province'));
-        setCropStage(localStorage.getItem('cropStage'));
-        setFarmSize(localStorage.getItem('farmSize'));
+        if (typeof window === "undefined") return;
+        try {
+            setDistrict(localStorage.getItem('district'));
+            setCrop(localStorage.getItem('crop'));
+            setProvince(localStorage.getItem('province'));
+            setCropStage(localStorage.getItem('cropStage'));
+            setFarmSize(localStorage.getItem('farmSize'));
 
-        const savedLang = localStorage.getItem('language') as Language;
-        if (savedLang) setLanguage(savedLang);
-
-        setIsLoaded(true);
+            const savedLang = localStorage.getItem('language') as Language;
+            if (savedLang) setLanguage(savedLang);
+        } finally {
+            setIsLoaded(true);
+        }
     }, []);
 
     // Update localStorage when state changes

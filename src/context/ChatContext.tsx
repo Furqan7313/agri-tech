@@ -13,7 +13,9 @@ export interface Message {
 interface ChatState {
     messages: Message[];
     isOpen: boolean;
+    sessionId: string | null;
     addMessage: (content: string, sender: "user" | "assistant", source?: string) => void;
+    setSessionId: (id: string | null) => void;
     toggleChat: () => void;
     setIsOpen: (open: boolean) => void;
 }
@@ -24,13 +26,14 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "welcome",
-            content: "Hello! I'm your AgriTech assistant. How can I help you today with your farming decisions?",
+            content: "Hello! I'm your AgriTech assistant. Ask me about crops, weather, diseases, or farming practices. I use our knowledge base to give you accurate answers.",
             sender: "assistant",
-            source: "System",
+            source: "Zarai Radar RAG",
             timestamp: new Date(),
         },
     ]);
     const [isOpen, setIsOpen] = useState(false);
+    const [sessionId, setSessionId] = useState<string | null>(null);
 
     const addMessage = (content: string, sender: "user" | "assistant", source?: string) => {
         const newMessage: Message = {
@@ -50,7 +53,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             value={{
                 messages,
                 isOpen,
+                sessionId,
                 addMessage,
+                setSessionId,
                 toggleChat,
                 setIsOpen,
             }}

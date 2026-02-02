@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Bug, CloudLightning, Info, ArrowRight } from "lucide-react";
+import { AlertTriangle, Bug, CloudLightning, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import { useAgri } from "@/context/AgriContext";
 import { getTranslation } from "@/lib/i18n";
+import { useState, useEffect, useCallback } from "react";
 
 type RiskLevel = "HIGH" | "MEDIUM" | "LOW";
 
@@ -27,34 +28,38 @@ interface RiskItem {
     actions_ur: string[];
 }
 
-const getRisksData = (): RiskItem[] => [
-    {
-        typeKey: "diseaseRisk",
-        level: "HIGH",
-        icon: <AlertTriangle className="w-5 h-5" />,
-        explanation_en: "High humidity (85%) combined with moderate temperatures (22°C) creates ideal conditions for Yellow Rust. Preventative fungicide spray is recommended immediately.",
-        explanation_ur: "زیادہ نمی (85٪) اور معتدل درجہ حرارت (22°C) زرد زنگ (Yellow Rust) کے لیے مثالی حالات پیدا کر رہے ہیں۔ حفاظتی فنگسائڈ اسپرے فوری طور پر تجویز کیا جاتا ہے۔",
-        actions_en: ["Monitor field density daily.", "Check for discoloration in lower leaves."],
-        actions_ur: ["روزانہ کھیت کی کثافت کی نگرانی کریں۔", "نچلے پتوں میں رنگت کی تبدیلی چیک کریں۔"]
-    },
-    {
-        typeKey: "pestRisk",
-        level: "MEDIUM",
-        icon: <Bug className="w-5 h-5" />,
-        explanation_en: "Aphid population is rising in neighboring districts. Monitor your crop density. Current wind speed favors migration.",
-        explanation_ur: "پڑوسی اضلاع میں سست تیلے (Aphid) کی آبادی بڑھ رہی ہے۔ فصل کی کثافت پر نظر رکھیں۔ موجودہ ہوا کی رفتار منتقلی کے لیے سازگار ہے۔",
-        actions_en: ["Place sticky traps.", "Monitor wind direction."],
-        actions_ur: ["چپکنے والے جال لگائیں۔", "ہوا کی سمت کی نگرانی کریں۔"]
-    },
-    {
-        typeKey: "climateRisk",
-        level: "LOW",
-        icon: <CloudLightning className="w-5 h-5" />,
-        explanation_en: "Weather forecast is favorable for the next 7 days. No extreme heat or heavy rainfall events predicted.",
-        explanation_ur: "اگلے 7 دنوں کے لیے موسم کی پیشگوئی سازگار ہے۔ شدید گرمی یا بھاری بارش کی کوئی پیشگوئی نہیں ہے۔",
-        actions_en: ["Continue routine irrigation.", "Maintain standard checks."],
-        actions_ur: ["معمول کی آبپاشی جاری رکھیں۔", "معیاری جانچ پڑتال برقرار رکھیں۔"]
-    }
+/** API risk item from GET /dashboard/climate-risk */
+interface ApiRiskItem {
+    type_key: string;
+    level: string;
+    message_en: string;
+    message_ur: string;
+    actions_en: string[];
+    actions_ur: string[];
+}
+
+const ICON_BY_TYPE: Record<string, React.ReactNode> = {
+    diseaseRisk: <AlertTriangle className="w-5 h-5" />,
+    pestRisk: <Bug className="w-5 h-5" />,
+    climateRisk: <CloudLightning className="w-5 h-5" />,
+};
+
+function apiRiskToItem(api: ApiRiskItem): RiskItem {
+    return {
+        typeKey: api.type_key,
+        level: api.level as RiskLevel,
+        icon: ICON_BY_TYPE[api.type_key] ?? <CloudLightning className="w-5 h-5" />,
+        explanation_en: api.message_en,
+        explanation_ur: api.message_ur,
+        actions_en: api.actions_en ?? [],
+        actions_ur: api.actions_ur ?? api.actions_en ?? [],
+    };
+}
+
+const FALLBACK_RISKS: RiskItem[] = [
+    { typeKey: "diseaseRisk", level: "LOW", icon: <AlertTriangle className="w-5 h-5" />, explanation_en: "Loading risk data.", explanation_ur: "خطرے کا ڈیٹا لوڈ ہو رہا ہے۔", actions_en: [], actions_ur: [] },
+    { typeKey: "pestRisk", level: "LOW", icon: <Bug className="w-5 h-5" />, explanation_en: "Loading risk data.", explanation_ur: "خطرے کا ڈیٹا لوڈ ہو رہا ہے۔", actions_en: [], actions_ur: [] },
+    { typeKey: "climateRisk", level: "LOW", icon: <CloudLightning className="w-5 h-5" />, explanation_en: "Loading risk data.", explanation_ur: "خطرے کا ڈیٹا لوڈ ہو رہا ہے۔", actions_en: [], actions_ur: [] },
 ];
 
 const LEVEL_COLORS: Record<RiskLevel, string> = {
@@ -66,7 +71,62 @@ const LEVEL_COLORS: Record<RiskLevel, string> = {
 export function RiskAssessmentPanel() {
     const { language } = useAgri();
     const t = (key: any) => getTranslation(language, key);
-    const risks = getRisksData();
+    const [risks, setRisks] = useState<RiskItem[]>(FALLBACK_RISKS);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const fetchRisks = useCallback(async () => {
+        if (typeof window === "undefined") return;
+        setLoading(true);
+        setError(null);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/dashboard/climate-risk`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...(typeof window !== "undefined" && localStorage.getItem("access_token")
+                            ? { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+                            : {}),
+                    },
+                    signal: controller.signal,
+                }
+            );
+            clearTimeout(timeoutId);
+            if (res.status === 401) {
+                setLoading(false);
+                if (typeof window !== "undefined") {
+                    localStorage.removeItem("access_token");
+                    localStorage.removeItem("user_id");
+                    localStorage.removeItem("user_email");
+                    localStorage.removeItem("username");
+                    window.location.href = "/login";
+                }
+                return;
+            }
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || err.error || "Failed to load risk assessment");
+            }
+            const data = await res.json();
+            const items: RiskItem[] = (data.risks ?? []).map((r: ApiRiskItem) => apiRiskToItem(r));
+            setRisks(items.length ? items : FALLBACK_RISKS);
+        } catch (e) {
+            const message = e instanceof Error ? e.message : "Failed to load risk assessment";
+            setError(e instanceof Error && e.name === "AbortError" ? "Request timed out. Try again." : message);
+            setRisks(FALLBACK_RISKS);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        fetchRisks();
+    }, [fetchRisks]);
 
     return (
         <Card className="border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl bg-white overflow-hidden h-full">
@@ -79,6 +139,16 @@ export function RiskAssessmentPanel() {
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
+                {error && (
+                    <div className="mx-4 mt-4 py-2 px-3 rounded-lg bg-red-50 border border-red-100 text-red-700 text-sm">
+                        {error}
+                    </div>
+                )}
+                {loading ? (
+                    <div className="flex justify-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B4332]" />
+                    </div>
+                ) : (
                 <div className="divide-y divide-gray-50">
                     {risks.map((risk) => (
                         <div key={risk.typeKey} className="group p-4 md:p-5 hover:bg-gray-50/50 transition-colors flex items-center justify-between">
@@ -167,6 +237,7 @@ export function RiskAssessmentPanel() {
                         </div>
                     ))}
                 </div>
+                )}
             </CardContent>
         </Card>
     );

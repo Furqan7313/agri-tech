@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockAuthService } from "@/lib/auth";
 
 import { useAgri } from "@/context/AgriContext";
 import { getTranslation } from "@/lib/i18n";
+import { apiClient } from "@/lib/api";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -20,6 +20,7 @@ export default function SignupPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState("");
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -28,22 +29,35 @@ export default function SignupPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError("");
     };
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError("");
 
         try {
-            // Mock Signup
-            const user = await mockAuthService.signup(formData.email, formData.password);
+            const response = await apiClient.post("/auth/signup", {
+                username: formData.name,
+                email: formData.email,
+                password: formData.password,
+            });
 
-            localStorage.setItem("user_id", user.user_id);
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.detail || "Signup failed");
+            }
 
-            // New users always go to setup
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("user_id", data.user.id || data.user.email);
+            localStorage.setItem("user_email", data.user.email);
+            localStorage.setItem("username", data.user.username);
+
             router.push("/setup");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Signup failed", error);
+            setError(error.message || "Failed to create account. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -74,6 +88,11 @@ export default function SignupPage() {
                 </CardHeader>
                 <CardContent className="grid gap-4">
                     <form onSubmit={handleSignup} className="space-y-4">
+                        {error && (
+                            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                                {error}
+                            </div>
+                        )}
                         <div className="grid gap-2">
                             <Label htmlFor="name">{t('fullName')}</Label>
                             <Input

@@ -19,6 +19,14 @@ interface SowingWindow {
     recommendation: string;
 }
 
+const defaultSowingWindow: SowingWindow = {
+    startMonth: "",
+    endMonth: "",
+    optimalDates: "",
+    status: "upcoming",
+    recommendation: "",
+};
+
 // Sowing windows based on crop and district
 const getSowingData = (crop: Crop, district: District, language: string): SowingWindow => {
     const isUrdu = language === 'ur';
@@ -87,7 +95,7 @@ const getSowingData = (crop: Crop, district: District, language: string): Sowing
             },
         },
     };
-    return sowingWindows[crop][district];
+    return sowingWindows[crop]?.[district] ?? defaultSowingWindow;
 };
 
 const statusConfig = {
@@ -130,7 +138,7 @@ export function SowingCalendar({ crop, district }: SowingCalendarProps) {
     const t = (key: any) => getTranslation(language, key);
 
     const sowingData = getSowingData(crop, district, language);
-    const config = statusConfig[sowingData.status];
+    const config = statusConfig[sowingData.status] ?? statusConfig.upcoming;
     const calendarMonths = generateCalendarMonths(crop);
 
     return (

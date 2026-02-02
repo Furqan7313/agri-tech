@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { Loader2, Sprout, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockAuthService } from "@/lib/auth";
 import { useAgri } from "@/context/AgriContext";
+import { apiClient } from "@/lib/api";
 
 const PROVINCES = ["Punjab", "Sindh", "KPK", "Balochistan"];
 
@@ -34,6 +35,7 @@ export default function ProfileSetupPage() {
         district: "",
         farmSize: "",
         cropStage: "",
+        phone: "",
     });
 
     const handleProvinceChange = (value: string) => {
@@ -41,13 +43,25 @@ export default function ProfileSetupPage() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.crop || !formData.province || !formData.district || !formData.cropStage) {
+        if (!formData.crop || !formData.province || !formData.district || !formData.cropStage || !formData.phone) {
             return; // Basic validation
         }
 
         setIsLoading(true);
         try {
-            await mockAuthService.saveProfile({ ...formData, user_id: localStorage.getItem("user_id") });
+            const response = await apiClient.post("/farmer-info", {
+                province: formData.province,
+                district: formData.district,
+                crop: formData.crop,
+                phone: formData.phone,
+                stage: formData.cropStage,
+                area: formData.farmSize || "Not specified",
+            });
+
+            if (!response.ok) {
+                const err = await response.json().catch(() => ({}));
+                throw new Error(err.detail || err.error || "Failed to save profile");
+            }
 
             // Update Context (which will sync to localStorage automatically)
             setCrop(formData.crop);
@@ -65,7 +79,7 @@ export default function ProfileSetupPage() {
         }
     };
 
-    const isFormValid = formData.crop && formData.province && formData.district && formData.cropStage;
+    const isFormValid = formData.crop && formData.province && formData.district && formData.cropStage && formData.phone;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#F0FDFA] to-[#E6F4D0] flex items-center justify-center p-4">
@@ -158,19 +172,31 @@ export default function ProfileSetupPage() {
                         </div>
                     </div>
 
-                    {/* Farm Size */}
-                    <div className="space-y-2">
-                        <Label className="text-sm font-medium text-gray-700">Farm Size <span className="text-muted-foreground font-normal opacity-70">(Optional)</span></Label>
-                        <Select onValueChange={(val) => setFormData({ ...formData, farmSize: val })} value={formData.farmSize}>
-                            <SelectTrigger className="h-11 bg-white border-gray-200 focus:ring-primary/20 focus:border-primary transition-all">
-                                <SelectValue placeholder="Select Farm Size" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {SIZES.map((s) => (
-                                    <SelectItem key={s} value={s}>{s}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                    {/* Farm Size & Phone */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium text-gray-700">Farm Size <span className="text-muted-foreground font-normal opacity-70">(Optional)</span></Label>
+                            <Select onValueChange={(val) => setFormData({ ...formData, farmSize: val })} value={formData.farmSize}>
+                                <SelectTrigger className="h-11 bg-white border-gray-200 focus:ring-primary/20 focus:border-primary transition-all">
+                                    <SelectValue placeholder="Select Farm Size" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {SIZES.map((s) => (
+                                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-sm font-medium text-gray-700">Phone Number</Label>
+                            <Input
+                                type="tel"
+                                placeholder="03XXXXXXXXX"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                className="h-11 bg-white border-gray-200 focus:ring-primary/20 focus:border-primary transition-all"
+                            />
+                        </div>
                     </div>
 
                 </CardContent>

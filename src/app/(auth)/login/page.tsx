@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockAuthService } from "@/lib/auth";
 
 import { useAgri } from "@/context/AgriContext";
 import { getTranslation } from "@/lib/i18n";
+import { apiClient } from "@/lib/api";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -21,6 +21,7 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [isPhoneLogin, setIsPhoneLogin] = useState(false);
+    const [error, setError] = useState("");
 
     const [formData, setFormData] = useState({
         email: "",
@@ -30,58 +31,64 @@ export default function LoginPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError("");
     };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError("");
 
         try {
-            // Mock Login (Simulate API delay)
-            await new Promise((resolve) => setTimeout(resolve, 1500));
-
-            // For phone login, we'll just simulate a successful OTP verification flow
-            const user = await mockAuthService.login(
-                isPhoneLogin ? "demo@agritech.com" : formData.email,
-                "password" // Mock password or real one
-            );
-
-            localStorage.setItem("user_id", user.user_id);
-
-            // SIMULATE DATA SYNC: 
-            // In a real app, we would fetch user profile here.
-            // For this mock, if the user doesn't have local data, we'll ASSUME they are a returning user 
-            // and populate with default mock data so they don't hit the Setup screen again.
-            // This fixes the "Setup Loop" on new devices/browsers.
-
-            const hasLocalProfile = localStorage.getItem("district");
-
-            if (!hasLocalProfile) {
-                // Simulate fetching profile from "Cloud"
-                const mockProfile = {
-                    district: "Lahore",
-                    province: "Punjab",
-                    crop: "Wheat",
-                    cropStage: "Vegetative",
-                    farmSize: "Medium (5-25 acres)"
-                };
-
-                // Update Context (which updates localStorage)
-                setDistrict(mockProfile.district);
-                setProvince(mockProfile.province);
-                setCrop(mockProfile.crop);
-                setCropStage(mockProfile.cropStage);
-                setFarmSize(mockProfile.farmSize);
-
-                // Allow a small tick for context to propagate if needed, though setters are usually fast enough relative to routing
-                // We'll trust the setters.
+            if (isPhoneLogin) {
+                setError("Phone login is not yet implemented. Please use email and password.");
+                setIsLoading(false);
+                return;
             }
 
-            // Navigate to Dashboard
-            router.push("/dashboard");
+            const response = await apiClient.post("/auth/login", {
+                email: formData.email,
+                password: formData.password,
+            });
 
-        } catch (error) {
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Login failed");
+            }
+
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("user_id", data.user.id || data.user.email);
+            localStorage.setItem("user_email", data.user.email);
+            localStorage.setItem("username", data.user.username);
+
+            try {
+                const profileResponse = await apiClient.get("/farmer-info");
+                if (profileResponse.ok) {
+                    const profileData = await profileResponse.json();
+                    const profile = profileData?.data;
+                    if (profile) {
+                        setDistrict(profile.district || "");
+                        setProvince(profile.province || "");
+                        setCrop(profile.crop || "");
+                        setCropStage(profile.stage || "");
+                        if (profile.area) setFarmSize(profile.area);
+                    }
+                    router.push("/dashboard");
+                } else if (profileResponse.status === 404) {
+                    router.push("/setup");
+                } else {
+                    const err = await profileResponse.json().catch(() => ({}));
+                    throw new Error(err.detail || "Failed to load farmer profile");
+                }
+            } catch (profileError) {
+                console.error("Profile load failed", profileError);
+                router.push("/setup");
+            }
+
+        } catch (error: any) {
             console.error("Login failed", error);
+            setError(error.message || "Login failed. Please check your credentials.");
         } finally {
             setIsLoading(false);
         }
@@ -118,6 +125,11 @@ export default function LoginPage() {
                 </CardHeader>
                 <CardContent className="grid gap-4">
                     <form onSubmit={handleLogin} className="space-y-4">
+                        {error && (
+                            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                                {error}
+                            </div>
+                        )}
                         {isPhoneLogin ? (
                             <div className="grid gap-2">
                                 <Label htmlFor="phone">{t('phoneNumber')}</Label>
