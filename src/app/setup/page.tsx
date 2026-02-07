@@ -28,19 +28,19 @@ const SOIL_TYPES = ["Loamy", "Sandy", "Clay"];
 
 export default function ProfileSetupPage() {
     const router = useRouter();
-    const { setCrop, setProvince, setDistrict, setCropStage, setFarmSize, setSoilType, setIrrigationType } = useAgri();
+    const { crop, province, district, cropStage, farmSize, soil_type, irrigation_type, setCrop, setProvince, setDistrict, setCropStage, setFarmSize, setSoilType, setIrrigationType } = useAgri();
 
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
-        crop: "",
-        province: "",
-        district: "",
-        farmSize: "",
-        cropStage: "",
+        crop: crop || "",
+        province: province || "",
+        district: district || "",
+        farmSize: farmSize || "",
+        cropStage: cropStage || "",
         phone: "",
         cropStartDate: "",
-        soilType: "",
-        irrigationType: "",
+        soilType: soil_type || "",
+        irrigationType: irrigation_type || "",
     });
 
     const handleProvinceChange = (value: string) => {
@@ -122,7 +122,7 @@ export default function ProfileSetupPage() {
         }
     };
 
-    const isFormValid = formData.crop && formData.province && formData.district && formData.cropStage && formData.phone;
+    const isFormValid = formData.crop && formData.province && formData.district && formData.cropStage && formData.phone && formData.soilType && formData.irrigationType;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#F0FDFA] to-[#E6F4D0] flex items-center justify-center p-4">

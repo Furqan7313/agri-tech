@@ -60,6 +60,33 @@ export default function DashboardPage() {
     useEffect(() => {
         if (!isLoaded) return;
 
+        // FAKE AUTHENTICATION FOR DEVELOPMENT
+        const fakeUserId = "fake-user-123";
+        if (!localStorage.getItem("user_id")) {
+            localStorage.setItem("user_id", fakeUserId);
+            localStorage.setItem("access_token", "fake-token-123");
+        }
+
+        // FAKE SETUP DATA
+        if (!isSelectionComplete) {
+            // Force update context/localstorage if missing
+            // This is a bit hacky but works for bypassing setup
+            if (!localStorage.getItem("district")) localStorage.setItem("district", "Lahore");
+            if (!localStorage.getItem("crop")) localStorage.setItem("crop", "Wheat");
+            if (!localStorage.getItem("province")) localStorage.setItem("province", "Punjab");
+            if (!localStorage.getItem("cropStage")) localStorage.setItem("cropStage", "Vegetative");
+            if (!localStorage.getItem("farmSize")) localStorage.setItem("farmSize", "Medium (5-25 acres)");
+            if (!localStorage.getItem("irrigationType")) localStorage.setItem("irrigationType", "Canal");
+            if (!localStorage.getItem("soilType")) localStorage.setItem("soilType", "Loamy");
+
+            // We need to reload to let context pick up these changes or we can modify context directly if exposed, 
+            // but reloading is safer to ensure context initializes correctly with "fake" storage.
+            if (!localStorage.getItem("fake_setup_done")) {
+                localStorage.setItem("fake_setup_done", "true");
+                window.location.reload();
+            }
+        }
+
         const userId = localStorage.getItem("user_id");
         if (!userId) {
             router.push("/signup");
@@ -67,7 +94,11 @@ export default function DashboardPage() {
         }
 
         if (userId && !isSelectionComplete) {
-            router.push("/setup");
+            // If we still think selection isn't complete (e.g. context hasn't updated yet), 
+            // we might redirect, but with the reload above it should handle it.
+            // However, let's just log instead of redirecting to prevent loops if something is weird
+            console.log("Selection might be incomplete, but bypassing for dev.");
+            // router.push("/setup"); 
         }
     }, [isLoaded, isSelectionComplete, router]);
 
