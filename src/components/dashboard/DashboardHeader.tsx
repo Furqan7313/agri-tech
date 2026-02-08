@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Wheat, Settings, Sprout, Bell, Bug, BellOff, User, LogOut, Languages, ChevronDown } from "lucide-react";
+import { Bell, BellOff, User, LogOut, Languages, ChevronDown, Bug, Wheat } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -27,14 +28,15 @@ export function DashboardHeader() {
     const [username, setUsername] = useState<string>("");
 
     useEffect(() => {
-        setUsername(localStorage.getItem("username") || "Profile");
+        setUsername(localStorage.getItem("username") || "");
     }, []);
+
     const [notifications, setNotifications] = useState([
         {
             id: 1,
             type: "risk",
-            title: "High Risk Disease Alert",
-            desc: "Leaf Curl Virus detected in your area.",
+            title: language === 'ur' ? "اعلیٰ خطرہ بیماری الرٹ" : "High Risk Disease Alert",
+            desc: language === 'ur' ? "آپ کے علاقے میں لیف کرل وائرس پایا گیا۔" : "Leaf Curl Virus detected in your area.",
             icon: Bug,
             color: "text-destructive",
             bg: "bg-destructive/10"
@@ -42,8 +44,8 @@ export function DashboardHeader() {
         {
             id: 2,
             type: "weather",
-            title: "Weather Update",
-            desc: "Light rain expected tomorrow.",
+            title: language === 'ur' ? "موسم کی تازہ کاری" : "Weather Update",
+            desc: language === 'ur' ? "کل ہلکی بارش متوقع ہے۔" : "Light rain expected tomorrow.",
             icon: Wheat,
             color: "text-secondary",
             bg: "bg-secondary/10"
@@ -60,6 +62,10 @@ export function DashboardHeader() {
         setNotifications([]);
     };
 
+    const toggleLanguage = () => {
+        setLanguage(language === 'en' ? 'ur' : 'en');
+    };
+
     const handleSignOut = () => {
         localStorage.removeItem("access_token");
         localStorage.removeItem("user_id");
@@ -69,33 +75,46 @@ export function DashboardHeader() {
     };
 
     return (
-        <header className="sticky top-0 z-50 bg-background border-b border-border shadow-sm">
+        <header className="sticky top-0 z-50 bg-[#1B4332] shadow-lg" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16 lg:h-20">
-                    {/* Logo */}
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary rounded-lg">
-                            <Sprout className="w-5 h-5 text-primary-foreground" />
-                        </div>
-                        <span className="font-heading text-lg lg:text-xl font-bold text-primary hidden sm:block">
-                            ZaraiRadar
-                        </span>
-                    </div>
+                    {/* Logo Only */}
+                    <Link href="/dashboard" className="flex items-center">
+                        <img
+                            src="/logo-transparent.png"
+                            alt="ZaraiRadar"
+                            className="h-12 w-auto"
+                        />
+                    </Link>
 
-                    {/* Actions */}
+                    {/* Right Actions */}
                     <div className="flex items-center gap-2">
+                        {/* Language Toggle with Text */}
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={toggleLanguage}
+                            className="h-9 px-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors gap-2"
+                        >
+                            <Languages className="h-4 w-4" />
+                            <span className="text-sm font-medium">{language === 'en' ? 'اردو' : 'English'}</span>
+                        </Button>
+
+                        {/* Notifications */}
                         <DropdownMenu onOpenChange={handleOpenChange}>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="relative cursor-pointer hover:bg-muted/50 rounded-full">
-                                    <Bell className="w-5 h-5 text-muted-foreground" />
+                                <Button variant="ghost" size="icon" className="relative cursor-pointer hover:bg-white/10 rounded-full text-white/80 hover:text-white">
+                                    <Bell className="w-5 h-5" />
                                     {hasUnread && notifications.length > 0 && (
-                                        <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-pulse" />
+                                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                                     )}
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-80 rounded-xl shadow-lg border-gray-100">
                                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
-                                    <DropdownMenuLabel className="p-0 font-heading text-sm">{t('notifications')}</DropdownMenuLabel>
+                                    <DropdownMenuLabel className="p-0 font-heading text-sm">
+                                        {language === 'ur' ? 'نوٹیفیکیشنز' : 'Notifications'}
+                                    </DropdownMenuLabel>
                                     {notifications.length > 0 && (
                                         <Button
                                             variant="ghost"
@@ -103,7 +122,7 @@ export function DashboardHeader() {
                                             className="h-6 text-[10px] text-muted-foreground hover:text-destructive px-2"
                                             onClick={clearNotifications}
                                         >
-                                            {t('clearAll')}
+                                            {language === 'ur' ? 'سب صاف کریں' : 'Clear all'}
                                         </Button>
                                     )}
                                 </div>
@@ -127,62 +146,35 @@ export function DashboardHeader() {
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
                                         <BellOff className="w-8 h-8 mb-3 opacity-20" />
-                                        <p className="text-sm">{t('noNotifications')}</p>
+                                        <p className="text-sm">{language === 'ur' ? 'کوئی نوٹیفیکیشن نہیں' : 'No notifications'}</p>
                                     </div>
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {/* Language Toggle */}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full"
-                            onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
-                            title={language === 'en' ? "Switch to Urdu" : "Switch to English"}
-                        >
-                            <Languages className="w-5 h-5" />
-                        </Button>
-
-                        <div className="w-px h-6 bg-gray-200 mx-1 hidden sm:block"></div>
-
-                        {/* Profile dropdown: username, Settings, Log out */}
+                        {/* Profile dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="ghost"
-                                    className="gap-2 pl-2 pr-3 h-9 rounded-full hover:bg-muted/50"
+                                    className="gap-2 pl-2 pr-3 h-9 rounded-full hover:bg-white/10 text-white/80 hover:text-white"
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <User className="w-4 h-4 text-primary" />
+                                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                                        <User className="w-4 h-4 text-white" />
                                     </div>
-                                    <span className="font-medium text-sm text-foreground max-w-[120px] truncate hidden sm:inline">
-                                        {username}
+                                    <span className="font-medium text-sm max-w-[100px] truncate hidden sm:inline">
+                                        {language === 'ur' ? 'فعال کسان' : 'Active Farmer'}
                                     </span>
-                                    <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" />
+                                    <ChevronDown className="w-4 h-4 shrink-0" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-lg border-gray-100">
-                                <DropdownMenuLabel className="font-normal">
-                                    <div className="flex flex-col gap-0.5">
-                                        <p className="text-xs text-muted-foreground">{t('profile') || "Profile"}</p>
-                                        <p className="font-semibold text-foreground truncate">{username}</p>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem
-                                    className="cursor-pointer"
-                                    onClick={() => setIsEditOpen(true)}
-                                >
-                                    <Settings className="w-4 h-4 mr-2" />
-                                    {t('settings') || t('editFarm') || "Settings"}
-                                </DropdownMenuItem>
                                 <DropdownMenuItem
                                     className="cursor-pointer text-destructive focus:text-destructive"
                                     onClick={handleSignOut}
                                 >
                                     <LogOut className="w-4 h-4 mr-2" />
-                                    {t('signOut') || "Log out"}
+                                    {language === 'ur' ? 'سائن آؤٹ' : 'Sign out'}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

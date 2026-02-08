@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Leaf, Languages } from "lucide-react";
+import { Eye, EyeOff, Loader2, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,67 +65,85 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-6 lg:p-8" dir={language === 'ur' ? 'rtl' : 'ltr'}>
+            {/* Language Toggle */}
             <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 right-4"
+                variant="outline"
+                size="sm"
+                className="absolute top-4 right-4 gap-2 bg-white border-gray-200 hover:bg-gray-100 text-gray-700"
                 onClick={() => setLanguage(language === 'en' ? 'ur' : 'en')}
-                title={language === 'en' ? "Switch to Urdu" : "Switch to English"}
             >
-                <Languages className="w-5 h-5 text-muted-foreground" />
+                <Languages className="w-4 h-4" />
+                <span className="text-sm font-medium">{language === 'en' ? 'اردو' : 'English'}</span>
             </Button>
-            <Card className="border-primary/20 shadow-lg w-full max-w-md">
-                <CardHeader className="space-y-1 text-center">
-                    <div className="flex justify-center mb-4">
-                        <div className="p-3 bg-primary/10 rounded-full">
-                            <Leaf className="w-8 h-8 text-primary" />
-                        </div>
+
+            <Card className="w-full max-w-md border border-gray-100 shadow-lg rounded-xl bg-white">
+                <CardHeader className="space-y-4 text-center pt-8 pb-4">
+                    {/* Logo */}
+                    <div className="flex justify-center">
+                        <Image
+                            src="/logo-transparent.png"
+                            alt="ZaraiRadar"
+                            width={120}
+                            height={120}
+                            className="h-20 w-auto"
+                        />
                     </div>
-                    <CardTitle className="text-2xl font-bold text-foreground">{t('createAccountTitle')}</CardTitle>
-                    <CardDescription>
-                        {t('createAccountSubtitle')}
-                    </CardDescription>
+                    <div>
+                        <CardTitle className="text-2xl font-bold text-gray-800 font-heading">
+                            {t('createAccountTitle')}
+                        </CardTitle>
+                        <CardDescription className="text-gray-500 mt-1">
+                            {t('createAccountSubtitle')}
+                        </CardDescription>
+                    </div>
                 </CardHeader>
-                <CardContent className="grid gap-4">
+
+                <CardContent className="px-6 pb-4">
                     <form onSubmit={handleSignup} className="space-y-4">
                         {error && (
-                            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
                                 {error}
                             </div>
                         )}
-                        <div className="grid gap-2">
-                            <Label htmlFor="name">{t('fullName')}</Label>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="name" className="text-sm font-medium text-gray-700">{t('fullName')}</Label>
                             <Input
                                 id="name"
                                 name="name"
                                 type="text"
                                 placeholder={t('usernamePlaceholder')}
                                 required
+                                className="h-11 bg-white border-gray-200 focus:border-[#1B4332] focus:ring-[#1B4332]/20"
                                 value={formData.name}
                                 onChange={handleChange}
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">{t('email')}</Label>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="email" className="text-sm font-medium text-gray-700">{t('email')}</Label>
                             <Input
                                 id="email"
                                 name="email"
                                 type="email"
                                 placeholder={t('enterEmail')}
                                 required
+                                className="h-11 bg-white border-gray-200 focus:border-[#1B4332] focus:ring-[#1B4332]/20"
                                 value={formData.email}
                                 onChange={handleChange}
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="password">{t('password')}</Label>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-sm font-medium text-gray-700">{t('password')}</Label>
                             <div className="relative">
                                 <Input
                                     id="password"
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     required
+                                    className="h-11 bg-white border-gray-200 focus:border-[#1B4332] focus:ring-[#1B4332]/20 pr-10"
                                     value={formData.password}
                                     onChange={handleChange}
                                 />
@@ -132,30 +151,36 @@ export default function SignupPage() {
                                     type="button"
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                                     onClick={() => setShowPassword(!showPassword)}
                                 >
                                     {showPassword ? (
-                                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                        <EyeOff className="h-4 w-4 text-gray-400" />
                                     ) : (
-                                        <Eye className="h-4 w-4 text-muted-foreground" />
+                                        <Eye className="h-4 w-4 text-gray-400" />
                                     )}
                                 </Button>
                             </div>
                         </div>
-                        <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" type="submit" disabled={isLoading}>
+
+                        <Button
+                            className="w-full h-11 bg-[#1B4332] hover:bg-[#2D5A47] text-white font-medium rounded-lg transition-colors"
+                            type="submit"
+                            disabled={isLoading}
+                        >
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {t('signup')}
                         </Button>
                     </form>
                 </CardContent>
-                <CardFooter className="flex flex-col gap-2">
-                    <div className="text-sm text-muted-foreground text-center">
+
+                <CardFooter className="pb-8 pt-4">
+                    <p className="text-sm text-gray-500 text-center w-full">
                         {t('alreadyHaveAccount')}{" "}
-                        <Link href="/login" className="text-primary hover:underline hover:text-primary/80 font-medium">
+                        <Link href="/login" className="text-[#1B4332] hover:text-[#2D5A47] font-semibold hover:underline">
                             {t('signIn')}
                         </Link>
-                    </div>
+                    </p>
                 </CardFooter>
             </Card>
         </div>

@@ -61,7 +61,7 @@ export function SowingCalendar({ crop, district }: SowingCalendarProps) {
     const config = (statusConfig as any)[data.status] ?? statusConfig.upcoming;
 
     return (
-        <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300">
+        <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <CardHeader className="pb-2">
                 <CardTitle className="font-heading text-lg flex items-center gap-2">
                     <div className="p-2 bg-[#52B788]/10 rounded-lg">

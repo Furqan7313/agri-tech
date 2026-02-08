@@ -7,17 +7,123 @@ import {
     ScanLine, TrendingUp
 } from "lucide-react";
 import Link from "next/link";
+import { useAgri } from "@/context/AgriContext";
+
+// Translations for FeaturesSection
+const FEATURES_TEXT = {
+    en: {
+        trustedBy: "Trusted by 50,000+ Farmers & Experts",
+        farmingUncertain: "Farming is",
+        uncertain: "Uncertain",
+        zaraiRadarBrings: "ZaraiRadar Brings",
+        clarity: "Clarity",
+        suddenWeather: "Sudden weather changes",
+        weatherDesc: "Loses, earlier, staggering.",
+        pestSurprises: "Pest & disease surprises",
+        pestDesc: "Devastating now, act in time.",
+        guessworkIrrigation: "Guesswork irrigation",
+        irrigationDesc: "See total running cost.",
+        risingCosts: "Rising input costs",
+        costsDesc: "Farmer's Control.",
+        hyperLocal: "Hyper-local forecasts",
+        forecastDesc: "Map pin, precise precip.",
+        earlyAlerts: "Early disease alerts",
+        alertsDesc: "Smart irrigation connected.",
+        smartIrrigation: "Smart irrigation guidance",
+        smartDesc: "Learn-right movement.",
+        dataBacked: "Data-backed decisions",
+        dataDesc: "Data-predicted, tested.",
+        noSensors: "No sensors. No apps to learn. Just WhatsApp.",
+        howItWorks: "How It Works",
+        simpleSteps: "Simple steps to start farming smarter today.",
+        registerPhone: "Register with your phone",
+        onlyTakes: "Only takes 30 seconds.",
+        tellUsCrop: "Tell us your crop & location",
+        personalizeEverything: "We personalize everything to your farm.",
+        getDailyInsights: "Get daily insights on WhatsApp",
+        wakeUp: "Wake up to weather & crop alerts directly on your phone.",
+        testimonialQuote: "Last year, I saved my wheat crop from rust because ZaraiRadar warned me early.",
+        farmerName: "— Ahmad",
+        farmerLocation: "Wheat Farmer, Sahiwal",
+        premiumFeatures: "Premium Features",
+        everythingYouNeed: "Everything You Need to",
+        maximizeYields: "Maximize Yields",
+        aiToolsDesc: "Our AI-powered tools replace guesswork with precision, protecting your crops from sowing to harvest.",
+        aiPowered: "AI Powered",
+        instantDisease: "Instant Disease Detection",
+        snapPhoto: "Snap a photo of your crop to identify diseases instantly using our AI engine.",
+        iotSensors: "IoT Sensors",
+        smartIrrigationTitle: "Smart Irrigation",
+        knowExactly: "Know exactly when and how much to water based on soil moisture data.",
+        predictiveAnalytics: "Predictive Analytics",
+        yieldForecasting: "Yield Forecasting",
+        predictHarvest: "Predict your harvest size and value weeks before you cut the crop.",
+        exploreFeature: "Explore Feature",
+    },
+    ur: {
+        trustedBy: "50,000+ کسانوں اور ماہرین کا اعتماد",
+        farmingUncertain: "کاشتکاری ہے",
+        uncertain: "غیر یقینی",
+        zaraiRadarBrings: "زرعی ریڈار لاتا ہے",
+        clarity: "وضاحت",
+        suddenWeather: "اچانک موسم کی تبدیلیاں",
+        weatherDesc: "نقصانات، پہلے، حیران کن۔",
+        pestSurprises: "کیڑے اور بیماری کی حیرتیں",
+        pestDesc: "اب تباہ کن، وقت پر کام کریں۔",
+        guessworkIrrigation: "اندازے سے آبپاشی",
+        irrigationDesc: "کل چلنے والی لاگت دیکھیں۔",
+        risingCosts: "بڑھتے ہوئے اخراجات",
+        costsDesc: "کسان کا کنٹرول۔",
+        hyperLocal: "انتہائی مقامی پیشن گوئیاں",
+        forecastDesc: "نقشے کی پن، درست بارش۔",
+        earlyAlerts: "جلد بیماری کے الرٹ",
+        alertsDesc: "سمارٹ آبپاشی سے جڑا ہوا۔",
+        smartIrrigation: "سمارٹ آبپاشی رہنمائی",
+        smartDesc: "صحیح حرکت سیکھیں۔",
+        dataBacked: "ڈیٹا پر مبنی فیصلے",
+        dataDesc: "ڈیٹا سے پیش گوئی، جانچ شدہ۔",
+        noSensors: "کوئی سینسر نہیں۔ سیکھنے کے لیے کوئی ایپ نہیں۔ صرف واٹس ایپ۔",
+        howItWorks: "یہ کیسے کام کرتا ہے",
+        simpleSteps: "آج ہوشیار کاشتکاری شروع کرنے کے آسان اقدامات۔",
+        registerPhone: "اپنے فون سے رجسٹر کریں",
+        onlyTakes: "صرف 30 سیکنڈ لگتے ہیں۔",
+        tellUsCrop: "اپنی فصل اور مقام بتائیں",
+        personalizeEverything: "ہم آپ کے کھیت کے مطابق ہر چیز ترتیب دیتے ہیں۔",
+        getDailyInsights: "واٹس ایپ پر روزانہ بصیرت حاصل کریں",
+        wakeUp: "موسم اور فصل کے الرٹ براہ راست اپنے فون پر حاصل کریں۔",
+        testimonialQuote: "پچھلے سال، میں نے اپنی گندم کی فصل کو زنگ سے بچایا کیونکہ زرعی ریڈار نے مجھے جلدی خبردار کیا۔",
+        farmerName: "— احمد",
+        farmerLocation: "گندم کاشتکار، ساہیوال",
+        premiumFeatures: "پریمیم فیچرز",
+        everythingYouNeed: "آپ کو جو کچھ چاہیے",
+        maximizeYields: "پیداوار زیادہ سے زیادہ کریں",
+        aiToolsDesc: "ہمارے AI سے چلنے والے اوزار اندازوں کی جگہ درستگی لاتے ہیں، بوائی سے کٹائی تک آپ کی فصلوں کی حفاظت کرتے ہیں۔",
+        aiPowered: "AI سے چلنے والا",
+        instantDisease: "فوری بیماری کی شناخت",
+        snapPhoto: "ہمارے AI انجن کا استعمال کرتے ہوئے فوری طور پر بیماریوں کی شناخت کے لیے اپنی فصل کی تصویر لیں۔",
+        iotSensors: "IoT سینسرز",
+        smartIrrigationTitle: "سمارٹ آبپاشی",
+        knowExactly: "جانیں کہ مٹی کی نمی کے ڈیٹا کی بنیاد پر کب اور کتنا پانی دینا ہے۔",
+        predictiveAnalytics: "پیش گوئی تجزیات",
+        yieldForecasting: "پیداوار کی پیشن گوئی",
+        predictHarvest: "فصل کاٹنے سے ہفتوں پہلے اپنی فصل کے سائز اور قدر کی پیش گوئی کریں۔",
+        exploreFeature: "فیچر دیکھیں",
+    }
+};
 
 export function FeaturesSection() {
+    const { language } = useAgri();
+    const t = (key: keyof typeof FEATURES_TEXT.en) => FEATURES_TEXT[language]?.[key] || FEATURES_TEXT['en'][key];
+
     return (
-        <section className="py-16 md:py-24 bg-[#F7F9F6]">
+        <section className="py-16 md:py-24 bg-[#F7F9F6]" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <div className="container mx-auto px-4">
 
                 {/* Trusted By Header */}
                 <div className="text-center mb-16 relative">
                     <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white border border-[#1F7A5A]/10 shadow-sm mb-6">
                         <span className="flex h-2 w-2 rounded-full bg-[#25D366]"></span>
-                        <p className="text-[#1F2933] font-semibold text-sm tracking-wide uppercase">Trusted by 50,000+ Farmers & Experts</p>
+                        <p className="text-[#1F2933] font-semibold text-sm tracking-wide uppercase">{t('trustedBy')}</p>
                     </div>
                 </div>
 
@@ -33,39 +139,38 @@ export function FeaturesSection() {
                                 alt="Stormy farm field"
                                 className="w-full h-full object-cover"
                             />
-                            {/* Overlay: #0F3D2E at 70% */}
                             <div className="absolute inset-0 bg-[#0F3D2E]/70 mix-blend-multiply"></div>
                             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/10"></div>
                         </div>
 
                         <div className="relative z-10">
                             <h2 className="text-2xl md:text-3xl font-bold text-white mb-10">
-                                Farming is <span className="text-[#9FD8C4]">Uncertain</span>
+                                {t('farmingUncertain')} <span className="text-[#9FD8C4]">{t('uncertain')}</span>
                             </h2>
 
                             <div className="space-y-8">
                                 <ComparisonItem
                                     icon={CloudLightning}
-                                    title="Sudden weather changes"
-                                    desc="Loses, earlier, staggering."
+                                    title={t('suddenWeather')}
+                                    desc={t('weatherDesc')}
                                     variant="problem"
                                 />
                                 <ComparisonItem
                                     icon={Bug}
-                                    title="Pest & disease surprises"
-                                    desc="Devastating now, act in time."
+                                    title={t('pestSurprises')}
+                                    desc={t('pestDesc')}
                                     variant="problem"
                                 />
                                 <ComparisonItem
                                     icon={Droplets}
-                                    title="Guesswork irrigation"
-                                    desc="See total running cost."
+                                    title={t('guessworkIrrigation')}
+                                    desc={t('irrigationDesc')}
                                     variant="problem"
                                 />
                                 <ComparisonItem
                                     icon={Coins}
-                                    title="Rising input costs"
-                                    desc="Farmer's Control."
+                                    title={t('risingCosts')}
+                                    desc={t('costsDesc')}
                                     variant="problem"
                                 />
                             </div>
@@ -81,39 +186,38 @@ export function FeaturesSection() {
                                 alt="Lush green farm"
                                 className="w-full h-full object-cover"
                             />
-                            {/* Overlay: #1F7A5A at 50% */}
                             <div className="absolute inset-0 bg-[#1F7A5A]/55 mix-blend-multiply"></div>
                             <div className="absolute inset-0 bg-gradient-to-r from-[#1F7A5A]/60 to-[#1F7A5A]/40"></div>
                         </div>
 
                         <div className="relative z-10">
                             <h2 className="text-2xl md:text-3xl font-bold text-white mb-10">
-                                ZaraiRadar Brings <span className="text-[#D1FAE5]">Clarity</span>
+                                {t('zaraiRadarBrings')} <span className="text-[#D1FAE5]">{t('clarity')}</span>
                             </h2>
 
                             <div className="space-y-8">
                                 <ComparisonItem
                                     icon={MapPin}
-                                    title="Hyper-local forecasts"
-                                    desc="Map pin, precise precip."
+                                    title={t('hyperLocal')}
+                                    desc={t('forecastDesc')}
                                     variant="solution"
                                 />
                                 <ComparisonItem
                                     icon={ShieldCheck}
-                                    title="Early disease alerts"
-                                    desc="Smart irrigation connected."
+                                    title={t('earlyAlerts')}
+                                    desc={t('alertsDesc')}
                                     variant="solution"
                                 />
                                 <ComparisonItem
                                     icon={Sprout}
-                                    title="Smart irrigation guidance"
-                                    desc="Learn-right movement."
+                                    title={t('smartIrrigation')}
+                                    desc={t('smartDesc')}
                                     variant="solution"
                                 />
                                 <ComparisonItem
                                     icon={BarChart3}
-                                    title="Data-backed decisions"
-                                    desc="Data-predicted, tested."
+                                    title={t('dataBacked')}
+                                    desc={t('dataDesc')}
                                     variant="solution"
                                 />
                             </div>
@@ -121,7 +225,7 @@ export function FeaturesSection() {
                             {/* Bottom Tagline */}
                             <div className="mt-12 pt-8 border-t border-white/20 text-center md:text-left">
                                 <p className="font-medium text-[#ECFDF5] text-lg opacity-90">
-                                    No sensors. No apps to learn. Just WhatsApp.
+                                    {t('noSensors')}
                                 </p>
                             </div>
                         </div>
@@ -131,8 +235,8 @@ export function FeaturesSection() {
                 {/* How It Works Section */}
                 <div className="mb-24 relative">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-[#1F2933] mb-4">How It Works</h2>
-                        <p className="text-[#6B7280] max-w-2xl mx-auto text-lg">Simple steps to start farming smarter today.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-[#1F2933] mb-4">{t('howItWorks')}</h2>
+                        <p className="text-[#6B7280] max-w-2xl mx-auto text-lg">{t('simpleSteps')}</p>
                     </div>
 
                     <div className="max-w-5xl mx-auto px-4 relative">
@@ -146,20 +250,20 @@ export function FeaturesSection() {
                             <HowItWorksStep
                                 number="1"
                                 icon={Smartphone}
-                                title="Register with your phone"
-                                desc="Only takes 30 seconds."
+                                title={t('registerPhone')}
+                                desc={t('onlyTakes')}
                             />
                             <HowItWorksStep
                                 number="2"
                                 icon={Sprout}
-                                title="Tell us your crop & location"
-                                desc="We personalize everything to your farm."
+                                title={t('tellUsCrop')}
+                                desc={t('personalizeEverything')}
                             />
                             <HowItWorksStep
                                 number="3"
                                 icon={MessageCircle}
-                                title="Get daily insights on WhatsApp"
-                                desc="Wake up to weather & crop alerts directly on your phone."
+                                title={t('getDailyInsights')}
+                                desc={t('wakeUp')}
                             />
                         </div>
                     </div>
@@ -181,13 +285,13 @@ export function FeaturesSection() {
                         <div className="md:w-7/12 p-8 md:p-14 lg:p-16 flex flex-col justify-center items-start text-left bg-white">
                             <Quote className="w-12 h-12 text-[#1F7A5A] mb-8 fill-current opacity-20" />
                             <p className="text-xl md:text-3xl text-[#1F2933] font-medium italic mb-10 leading-relaxed font-heading">
-                                "Last year, I saved my wheat crop from rust because ZaraiRadar warned me early."
+                                "{t('testimonialQuote')}"
                             </p>
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-1 bg-[#1F7A5A] rounded-full"></div>
                                 <div>
-                                    <p className="font-bold text-[#1F2933] text-xl tracking-wide">— Ahmad</p>
-                                    <p className="text-[#6B7280] text-sm font-medium mt-1">Wheat Farmer, Sahiwal</p>
+                                    <p className="font-bold text-[#1F2933] text-xl tracking-wide">{t('farmerName')}</p>
+                                    <p className="text-[#6B7280] text-sm font-medium mt-1">{t('farmerLocation')}</p>
                                 </div>
                             </div>
                         </div>
@@ -197,13 +301,13 @@ export function FeaturesSection() {
                 {/* Key Features Header */}
                 <div className="text-center mb-20">
                     <div className="inline-block px-4 py-1.5 rounded-full bg-[#1F7A5A]/10 text-[#1F7A5A] font-semibold text-sm mb-4 tracking-wider uppercase">
-                        Premium Features
+                        {t('premiumFeatures')}
                     </div>
                     <h3 className="text-3xl md:text-5xl font-bold text-[#1F2933] mb-6 font-heading">
-                        Everything You Need to <br className="hidden md:block" /> <span className="text-[#1F7A5A]">Maximize Yields</span>
+                        {t('everythingYouNeed')} <br className="hidden md:block" /> <span className="text-[#1F7A5A]">{t('maximizeYields')}</span>
                     </h3>
                     <p className="text-[#6B7280] text-lg max-w-2xl mx-auto leading-relaxed">
-                        Our AI-powered tools replace guesswork with precision, protecting your crops from sowing to harvest.
+                        {t('aiToolsDesc')}
                     </p>
                 </div>
 
@@ -215,29 +319,30 @@ export function FeaturesSection() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-20 relative z-10">
                         <FeatureImageCard
                             image="/corn-disease.png"
-                            badge="AI Powered"
+                            badge={t('aiPowered')}
                             icon={ScanLine}
-                            title="Instant Disease Detection"
-                            desc="Snap a photo of your crop to identify diseases instantly using our AI engine."
+                            title={t('instantDisease')}
+                            desc={t('snapPhoto')}
+                            exploreText={t('exploreFeature')}
                         />
                         <FeatureImageCard
                             image="/smart-irrigation.png"
-                            badge="IoT Sensors"
+                            badge={t('iotSensors')}
                             icon={Droplets}
-                            title="Smart Irrigation"
-                            desc="Know exactly when and how much to water based on soil moisture data."
+                            title={t('smartIrrigationTitle')}
+                            desc={t('knowExactly')}
+                            exploreText={t('exploreFeature')}
                         />
                         <FeatureImageCard
                             image="/yield-maximization.png"
-                            badge="Predictive Analytics"
+                            badge={t('predictiveAnalytics')}
                             icon={TrendingUp}
-                            title="Yield Forecasting"
-                            desc="Predict your harvest size and value weeks before you cut the crop."
+                            title={t('yieldForecasting')}
+                            desc={t('predictHarvest')}
+                            exploreText={t('exploreFeature')}
                         />
                     </div>
                 </div>
-
-
 
             </div>
         </section>
@@ -246,9 +351,6 @@ export function FeaturesSection() {
 
 function ComparisonItem({ icon: Icon, title, desc, variant = "problem" }: any) {
     const isProblem = variant === "problem";
-
-    // Problem: Icons #9FD8C4, Text White/Grey
-    // Solution: Icons White, Text White/Mint
 
     const iconColor = isProblem ? "text-[#9FD8C4]" : "text-white";
     const titleColor = "text-white";
@@ -292,7 +394,7 @@ function HowItWorksStep({ number, icon: Icon, title, desc }: any) {
     )
 }
 
-function FeatureImageCard({ image, title, desc, icon: Icon, badge }: any) {
+function FeatureImageCard({ image, title, desc, icon: Icon, badge, exploreText }: any) {
     return (
         <Link href="/dashboard" className="block h-full">
             <div className="group h-full bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(31,122,90,0.1)] hover:border-[#1F7A5A]/20 transition-all duration-500 cursor-pointer flex flex-col">
@@ -326,7 +428,7 @@ function FeatureImageCard({ image, title, desc, icon: Icon, badge }: any) {
                     </div>
 
                     <div className="mt-auto flex items-center gap-2 text-[#1F7A5A] font-bold text-sm tracking-wide group-hover:gap-3 transition-all duration-300">
-                        <span>Explore Feature</span>
+                        <span>{exploreText}</span>
                         <ArrowRight className="w-4 h-4" />
                     </div>
                 </div>

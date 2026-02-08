@@ -8,12 +8,37 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { useAgri } from "@/context/AgriContext";
 import { getTranslation } from "@/lib/i18n";
 
+// Hero-specific translations
+const HERO_TEXT = {
+    en: {
+        heroTitle1: "AI-Powered Farming",
+        heroTitle2: "for Punjab's Fields",
+        heroSubtitle: "Real-time weather, disease alerts, and crop guidance—tailored to your land.",
+        getStartedFree: "Get Started Free",
+        accuracy: "Accuracy",
+        monitoring: "Monitoring",
+        higherYield: "Higher Yield",
+        districts: "Districts",
+    },
+    ur: {
+        heroTitle1: "AI سے چلنے والی کاشتکاری",
+        heroTitle2: "پنجاب کے کھیتوں کے لیے",
+        heroSubtitle: "حقیقی وقت میں موسم، بیماری کے الرٹ، اور فصل کی رہنمائی—آپ کی زمین کے مطابق۔",
+        getStartedFree: "مفت شروع کریں",
+        accuracy: "درستگی",
+        monitoring: "نگرانی",
+        higherYield: "زیادہ پیداوار",
+        districts: "اضلاع",
+    }
+};
+
 export function Hero() {
     const { language, setLanguage } = useAgri();
     const t = (key: any) => getTranslation(language, key);
+    const ht = (key: keyof typeof HERO_TEXT.en) => HERO_TEXT[language]?.[key] || HERO_TEXT['en'][key];
 
     return (
-        <section className="relative w-full min-h-screen overflow-hidden flex flex-col">
+        <section className="relative w-full min-h-screen overflow-hidden flex flex-col" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <img
@@ -33,7 +58,7 @@ export function Hero() {
                 </div>
 
                 {/* Desktop Nav Right */}
-                <div className="hidden md:flex items-center gap-6">
+                <div className="hidden md:flex items-center gap-4">
                     <Link href="/login" className="text-white font-medium hover:text-emerald-400 transition-colors">
                         {t("login")}
                     </Link>
@@ -43,12 +68,12 @@ export function Hero() {
                         </Button>
                     </Link>
                     <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-white hover:bg-white/10 rounded-full"
+                        size="sm"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg gap-2 px-4 py-2 font-bold shadow-md transition-all"
                         onClick={() => setLanguage(language === "en" ? "ur" : "en")}
                     >
-                        <Globe className="w-6 h-6" />
+                        <Globe className="w-4 h-4" />
+                        <span className="text-sm font-medium">{language === "en" ? "اردو" : "English"}</span>
                     </Button>
                 </div>
 
@@ -74,12 +99,12 @@ export function Hero() {
                                     </Button>
                                 </Link>
                                 <Button
-                                    variant="ghost"
-                                    className="justify-start text-lg"
+                                    variant="outline"
+                                    className="justify-start text-lg gap-2"
                                     onClick={() => setLanguage(language === "en" ? "ur" : "en")}
                                 >
-                                    <Globe className="mr-2" />
-                                    {language === "en" ? "Urdu" : "English"}
+                                    <Globe className="w-5 h-5" />
+                                    {language === "en" ? "اردو" : "English"}
                                 </Button>
                             </div>
                         </SheetContent>
@@ -90,16 +115,16 @@ export function Hero() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col items-center justify-center text-center px-4 pt-16 pb-32 relative z-10">
                 <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-tight drop-shadow-lg">
-                    AI-Powered Farming
+                    {ht('heroTitle1')}
                     <br />
-                    <span className="text-emerald-400">for Punjab’s Fields</span>
+                    <span className="text-emerald-400">{ht('heroTitle2')}</span>
                 </h1>
 
                 {/* Separator Line */}
                 <div className="w-full max-w-2xl h-px bg-gradient-to-r from-transparent via-white/50 to-transparent my-6"></div>
 
                 <p className="max-w-3xl text-lg sm:text-xl text-white/90 font-medium drop-shadow-md mb-10">
-                    Real-time weather, disease alerts, and crop guidance—tailored to your land.
+                    {ht('heroSubtitle')}
                 </p>
 
                 <Link href="/signup">
@@ -107,7 +132,7 @@ export function Hero() {
                         size="lg"
                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-7 text-xl rounded-md shadow-2xl transition-transform hover:scale-105"
                     >
-                        Get Started Free
+                        {ht('getStartedFree')}
                     </Button>
                 </Link>
             </div>
@@ -115,10 +140,10 @@ export function Hero() {
             {/* Stats Cards - Bottom */}
             <div className="absolute bottom-10 w-full px-4 z-20">
                 <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                    <StatCard icon={Shield} value="98%" label="Accuracy" />
-                    <StatCard icon={Activity} value="24/7" label="Monitoring" />
-                    <StatCard icon={TrendingUp} value="30%" label="Higher Yield" />
-                    <StatCard icon={MapPin} value="25+" label="Districts" />
+                    <StatCard icon={Shield} value="98%" label={ht('accuracy')} />
+                    <StatCard icon={Activity} value="24/7" label={ht('monitoring')} />
+                    <StatCard icon={TrendingUp} value="30%" label={ht('higherYield')} />
+                    <StatCard icon={MapPin} value="25+" label={ht('districts')} />
                 </div>
             </div>
         </section>

@@ -81,7 +81,7 @@ export function IrrigationTimeline({ crop }: IrrigationTimelineProps) {
         : `Recommended: ${data.reason}, ${data.depth_inches} inches, ${data.timing}`;
 
     return (
-        <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300">
+        <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <CardHeader className="pb-2">
                 <CardTitle className="font-heading text-lg flex items-center gap-2">
                     <div className="p-2 bg-agri-info/10 rounded-lg">

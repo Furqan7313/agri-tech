@@ -28,7 +28,7 @@ export function LiveClimatePanel() {
     }
 
     return (
-        <Card className="border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl bg-white overflow-hidden">
+        <Card className="border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl bg-white overflow-hidden" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <CardHeader className="pb-4 pt-6 px-6 flex flex-row items-center justify-between border-b border-gray-50">
                 <CardTitle className="font-heading text-lg flex items-center gap-3 text-[#1B4332]">
                     <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">

@@ -102,7 +102,7 @@ export function FertilizerCard({ crop, userId, area = 10 }: FertilizerCardProps)
     const total = plan.npkRatio.nitrogen + plan.npkRatio.phosphorus + plan.npkRatio.potassium || 1;
 
     return (
-        <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300">
+        <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow duration-300" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <CardHeader className="pb-2">
                 <CardTitle className="font-heading text-lg flex items-center gap-2">
                     <div className="p-2 bg-[#D4A373]/10 rounded-lg">

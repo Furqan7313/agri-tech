@@ -56,14 +56,20 @@ export function AgriProvider({ children }: { children: ReactNode }) {
 
         setIsDashboardLoading(true);
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/dashboard/overview`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
+                    signal: controller.signal,
                 }
             );
+
+            clearTimeout(timeoutId);
 
             if (res.ok) {
                 const data = await res.json();
@@ -80,7 +86,11 @@ export function AgriProvider({ children }: { children: ReactNode }) {
                 }
             }
         } catch (error) {
-            console.error("Failed to fetch dashboard overview:", error);
+            // Silently handle network errors - demo data will be used instead
+            // Only log in development if explicitly needed for debugging
+            if (process.env.NODE_ENV === 'development' && !(error instanceof TypeError)) {
+                console.warn("Dashboard API unavailable, using demo data");
+            }
         } finally {
             setIsDashboardLoading(false);
         }

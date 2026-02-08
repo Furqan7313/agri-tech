@@ -167,6 +167,7 @@ export const translations = {
         enterEmail: "name@example.com",
         enterPhone: "+92 300 1234567",
         usernamePlaceholder: "username",
+        back: "Back",
     },
     ur: {
         loading: "آپ کا فارم ڈیٹا لوڈ ہو رہا ہے...",
@@ -334,6 +335,7 @@ export const translations = {
         enterEmail: "name@example.com",
         enterPhone: "+92 300 1234567",
         usernamePlaceholder: "صارف کا نام",
+        back: "واپس",
     }
 };
 

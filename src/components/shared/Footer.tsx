@@ -10,7 +10,7 @@ export function Footer() {
 
 
     return (
-        <footer className="bg-[#0F3D2E] text-white pt-24 pb-12 relative overflow-hidden font-sans">
+        <footer className="bg-[#0F3D2E] text-white pt-24 pb-12 relative overflow-hidden font-sans" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             {/* Background Gradient Mesh */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-[#1F7A5A]/30 rounded-full blur-3xl opacity-50"></div>

@@ -34,7 +34,7 @@ export function WeatherForecastCard() {
     }
 
     return (
-        <Card className="border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl bg-white overflow-hidden">
+        <Card className="border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 rounded-2xl bg-white overflow-hidden" dir={language === 'ur' ? 'rtl' : 'ltr'}>
             <CardHeader className="pb-2 pt-4 px-6 border-b border-gray-50">
                 <CardTitle className="font-heading text-sm font-semibold text-[#1B4332] flex items-center gap-2">
                     <Sun className="w-4 h-4 text-amber-500" />
