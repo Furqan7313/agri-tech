@@ -48,6 +48,7 @@ import { QuickStatsBar } from "@/components/dashboard/QuickStatsBar";
 import { LiveClimatePanel } from "@/components/dashboard/LiveClimatePanel";
 import { WeatherForecastCard } from "@/components/dashboard/WeatherForecastCard";
 import { RiskAssessmentPanel } from "@/components/dashboard/RiskAssessmentPanel";
+import { DiseasePredictionCard } from "@/components/dashboard/DiseasePredictionCard";
 import { FertilizerCard } from "@/components/dashboard/FertilizerCard";
 import { IrrigationTimeline } from "@/components/dashboard/IrrigationTimeline";
 import { SowingCalendar } from "@/components/dashboard/SowingCalendar";
@@ -78,7 +79,6 @@ export default function DashboardPage() {
             return;
         }
     }, [isLoaded, isSelectionComplete, router]);
-
 
     if (!isLoaded || !isSelectionComplete) {
         return (
@@ -141,6 +141,9 @@ export default function DashboardPage() {
                             <span className="w-1 h-6 bg-[#E63946] rounded-full"></span>
                             {t('riskMonitoring')}
                         </h2>
+
+                        {/* Disease Prediction (AI Image Diagnostic) */}
+                        <DiseasePredictionCard />
 
                         {/* Risk Assessment Panel */}
                         <RiskAssessmentPanel />

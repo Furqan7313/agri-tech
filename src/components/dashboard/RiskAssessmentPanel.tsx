@@ -12,7 +12,7 @@ type RiskLevel = "HIGH" | "MEDIUM" | "LOW";
 
 interface RiskDetail {
     name: string;
-    symptoms?: string[];
+    symptoms?: string[] | string;
     management?: any;
     severity: string;
     impact?: string;
@@ -143,16 +143,16 @@ export function RiskAssessmentPanel() {
                                                                 </Badge>
                                                             </div>
 
-                                                            {detail.symptoms && detail.symptoms.length > 0 && (
+                                                            {detail.symptoms && (Array.isArray(detail.symptoms) ? detail.symptoms.length > 0 : detail.symptoms.length > 0) && (
                                                                 <div className="mb-3">
                                                                     <div className="text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-1 flex items-center gap-1.5">
                                                                         <Activity className="w-3 h-3" />
                                                                         Symptoms
                                                                     </div>
                                                                     <div className="flex flex-wrap gap-2">
-                                                                        {detail.symptoms.map((s, i) => (
+                                                                        {(Array.isArray(detail.symptoms) ? detail.symptoms : detail.symptoms.split(/[.,]/).filter(s => s.trim())).map((s, i) => (
                                                                             <span key={i} className="text-xs bg-white py-0.5 px-2 rounded-md border border-gray-100 text-gray-600 shadow-sm">
-                                                                                {s}
+                                                                                {s.trim()}
                                                                             </span>
                                                                         ))}
                                                                     </div>

@@ -85,55 +85,7 @@ export function WelcomeBanner() {
                         </p>
                     </div>
 
-                    {/* Filters */}
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white backdrop-blur-sm rounded-lg px-4 py-2 h-10 transition-colors"
-                                >
-                                    <Calendar className="w-4 h-4 mr-2 text-green-300" />
-                                    <span className="font-medium">{t(timeRange)}</span>
-                                    <ChevronDown className="w-4 h-4 ml-2 opacity-70" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-lg border border-gray-100 shadow-xl bg-white">
-                                {timeRanges.map((range) => (
-                                    <DropdownMenuItem
-                                        key={range}
-                                        onClick={() => setTimeRange(range)}
-                                        className="cursor-pointer rounded-md font-medium hover:bg-green-50 transition-colors"
-                                    >
-                                        {t(range)}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white backdrop-blur-sm rounded-lg px-4 py-2 h-10 transition-colors"
-                                >
-                                    <span className="font-medium">{t(fieldFilter)}</span>
-                                    <ChevronDown className="w-4 h-4 ml-2 opacity-70" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-lg border border-gray-100 shadow-xl bg-white">
-                                {fieldOptions.map((field) => (
-                                    <DropdownMenuItem
-                                        key={field}
-                                        onClick={() => setFieldFilter(field)}
-                                        className="cursor-pointer rounded-md font-medium hover:bg-green-50 transition-colors"
-                                    >
-                                        {t(field)}
-                                    </DropdownMenuItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
                 </div>
             </div>
         </div>
