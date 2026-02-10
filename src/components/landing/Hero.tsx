@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Menu, Globe, Shield, Activity, TrendingUp, MapPin } from "lucide-react";
+import { Menu, Globe, Shield, Activity, TrendingUp, MapPin, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
@@ -33,9 +33,27 @@ const HERO_TEXT = {
 };
 
 export function Hero() {
-    const { language, setLanguage } = useAgri();
+    const { language, setLanguage, dashboardData } = useAgri();
     const t = (key: any) => getTranslation(language, key);
     const ht = (key: keyof typeof HERO_TEXT.en) => HERO_TEXT[language]?.[key] || HERO_TEXT['en'][key];
+
+    const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+    const [username, setUsername] = React.useState("");
+
+    React.useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        const storedUsername = localStorage.getItem("username");
+        setIsAuthenticated(!!token);
+        setUsername(dashboardData?.profile?.username || storedUsername || "");
+    }, [dashboardData]);
+
+    const handleSignOut = () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("username");
+        window.location.reload();
+    };
 
     return (
         <section className="relative w-full min-h-screen overflow-hidden flex flex-col" dir={language === 'ur' ? 'rtl' : 'ltr'}>
@@ -54,19 +72,41 @@ export function Hero() {
             <nav className="absolute top-0 w-full flex items-center justify-between px-6 py-1 z-50">
                 {/* Logo Left */}
                 <div className="flex items-center">
-                    <img src="/logo-transparent.png" alt="ZaraiRadar" className="h-20 sm:h-24 md:h-32 w-auto" />
+                    <img src="/logo.png" alt="ZaraiRadar" className="h-20 sm:h-24 md:h-32 w-auto" />
                 </div>
 
                 {/* Desktop Nav Right */}
                 <div className="hidden md:flex items-center gap-4">
-                    <Link href="/login" className="text-white font-medium hover:text-emerald-400 transition-colors">
-                        {t("login")}
-                    </Link>
-                    <Link href="/signup">
-                        <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 rounded-md font-bold transition-all shadow-md">
-                            {t("signup")}
-                        </Button>
-                    </Link>
+                    {isAuthenticated ? (
+                        <div className="flex items-center gap-4">
+                            <Link href="/dashboard" className="flex items-center gap-2 text-white font-medium hover:text-emerald-400 transition-colors">
+                                <div className="w-8 h-8 rounded-full bg-emerald-600/50 flex items-center justify-center border border-emerald-400/30">
+                                    <User className="w-4 h-4" />
+                                </div>
+                                <span>{username || (language === 'ur' ? 'ڈیش بورڈ' : 'Dashboard')}</span>
+                            </Link>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-white hover:bg-white/10 hover:text-emerald-400 gap-2 font-medium"
+                                onClick={handleSignOut}
+                            >
+                                <LogOut className="w-4 h-4" />
+                                {language === 'ur' ? 'سائن آؤٹ' : 'Sign out'}
+                            </Button>
+                        </div>
+                    ) : (
+                        <>
+                            <Link href="/login" className="text-white font-medium hover:text-emerald-400 transition-colors">
+                                {t("login")}
+                            </Link>
+                            <Link href="/signup">
+                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 rounded-md font-bold transition-all shadow-md">
+                                    {t("signup")}
+                                </Button>
+                            </Link>
+                        </>
+                    )}
                     <Button
                         size="sm"
                         className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg gap-2 px-4 py-2 font-bold shadow-md transition-all"
@@ -88,16 +128,45 @@ export function Hero() {
                         <SheetContent>
                             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                             <div className="flex flex-col gap-4 mt-8">
-                                <Link href="/login">
-                                    <Button variant="ghost" className="w-full justify-start text-lg">
-                                        {t("login")}
-                                    </Button>
-                                </Link>
-                                <Link href="/signup">
-                                    <Button className="w-full bg-emerald-600 text-white">
-                                        {t("signup")}
-                                    </Button>
-                                </Link>
+                                {isAuthenticated ? (
+                                    <>
+                                        <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 rounded-lg">
+                                            <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white">
+                                                <User className="w-5 h-5" />
+                                            </div>
+                                            <div className="font-semibold text-emerald-900">
+                                                {username || (language === 'ur' ? 'فعال کسان' : 'Active Farmer')}
+                                            </div>
+                                        </div>
+                                        <Link href="/dashboard">
+                                            <Button className="w-full bg-emerald-600 text-white justify-start gap-3">
+                                                <Activity className="w-5 h-5" />
+                                                {language === 'ur' ? 'ڈیش بورڈ پر جائیں' : 'Go to Dashboard'}
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            variant="outline"
+                                            className="w-full justify-start gap-3 text-destructive border-destructive/20"
+                                            onClick={handleSignOut}
+                                        >
+                                            <LogOut className="w-5 h-5" />
+                                            {language === 'ur' ? 'سائن آؤٹ' : 'Sign out'}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href="/login">
+                                            <Button variant="ghost" className="w-full justify-start text-lg">
+                                                {t("login")}
+                                            </Button>
+                                        </Link>
+                                        <Link href="/signup">
+                                            <Button className="w-full bg-emerald-600 text-white">
+                                                {t("signup")}
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
                                 <Button
                                     variant="outline"
                                     className="justify-start text-lg gap-2"
@@ -127,25 +196,27 @@ export function Hero() {
                     {ht('heroSubtitle')}
                 </p>
 
-                <Link href="/signup">
+                <Link href={isAuthenticated ? "/dashboard" : "/signup"}>
                     <Button
                         size="lg"
                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-7 text-xl rounded-md shadow-2xl transition-transform hover:scale-105"
                     >
-                        {ht('getStartedFree')}
+                        {isAuthenticated
+                            ? (language === 'ur' ? 'ڈیش بورڈ پر جائیں' : 'Go to Dashboard')
+                            : ht('getStartedFree')}
                     </Button>
                 </Link>
             </div>
 
             {/* Stats Cards - Bottom */}
-            <div className="absolute bottom-10 w-full px-4 z-20">
+            {/* <div className="absolute bottom-10 w-full px-4 z-20">
                 <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                     <StatCard icon={Shield} value="98%" label={ht('accuracy')} />
                     <StatCard icon={Activity} value="24/7" label={ht('monitoring')} />
                     <StatCard icon={TrendingUp} value="30%" label={ht('higherYield')} />
                     <StatCard icon={MapPin} value="25+" label={ht('districts')} />
                 </div>
-            </div>
+            </div> */}
         </section>
     );
 }

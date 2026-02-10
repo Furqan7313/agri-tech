@@ -20,11 +20,11 @@ export function DashboardNav() {
                     {/* Logo & Nav */}
                     <div className="flex items-center gap-8">
                         {/* Logo */}
-                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/dashboard")}>
-                            <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                                <Sprout className="w-4 h-4 text-white" />
+                        <div className="flex items-center gap-2 cursor-pointer group" onClick={() => router.push("/")}>
+                            <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center transition-transform group-hover:scale-110">
+                                <Sprout className="w-6 h-6 text-white" />
                             </div>
-                            <span className="font-bold text-lg text-green-700">
+                            <span className="font-bold text-xl text-green-700">
                                 Zarai<span className="text-green-600">Radar</span>
                             </span>
                         </div>
@@ -36,8 +36,8 @@ export function DashboardNav() {
                                     key={item.label}
                                     onClick={() => router.push(item.href)}
                                     className={`px-3 py-1.5 text-sm font-medium transition-colors ${item.active
-                                            ? "text-gray-900 border-b-2 border-green-600"
-                                            : "text-gray-600 hover:text-gray-900"
+                                        ? "text-gray-900 border-b-2 border-green-600"
+                                        : "text-gray-600 hover:text-gray-900"
                                         }`}
                                 >
                                     {item.label}

@@ -17,7 +17,7 @@ const TRUSTED_TEXT = {
         corp: "Corp",
         millat: "Millat",
         tractors: "Tractors",
-        narc: "NARC",
+        narc: "Ministry of National Food Security and Research",
         islamabad: "Islamabad",
     },
     ur: {
@@ -32,7 +32,7 @@ const TRUSTED_TEXT = {
         corp: "کارپ",
         millat: "ملت",
         tractors: "ٹریکٹرز",
-        narc: "این اے آر سی",
+        narc: "قومی غذائی تحفظ و تحقیق",
         islamabad: "اسلام آباد",
     }
 };

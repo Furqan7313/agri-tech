@@ -1,10 +1,10 @@
 "use client";
 
 import { MapPin, Sprout, Wheat, Droplet } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useAgri } from "@/context/AgriContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { getTranslation } from "@/lib/i18n";
+import { RiskGauge } from "./visuals/RiskGauge";
 
 export function FarmerSnapshot() {
     const {
@@ -24,6 +24,16 @@ export function FarmerSnapshot() {
     // If data exists in dashboardData, it means it's synced with profile
     const profile = dashboardData?.profile || {};
 
+    // Calculate a mock health score based on risks
+    const calculateHealthScore = () => {
+        if (!dashboardData?.risk?.assessments) return 100;
+        const weights = { HIGH: 30, MEDIUM: 15, LOW: 5 };
+        const totalPenalty = dashboardData.risk.assessments.reduce((acc: number, r: any) => acc + (weights[r.level as keyof typeof weights] || 0), 0);
+        return Math.max(0, 100 - totalPenalty);
+    };
+
+    const healthScore = calculateHealthScore();
+
     if (isDashboardLoading && !dashboardData) {
         return (
             <Card className="border-[#DCFCE7] bg-[#F0FDF4] shadow-sm mb-6 rounded-2xl animate-pulse h-24" />
@@ -31,61 +41,76 @@ export function FarmerSnapshot() {
     }
 
     return (
-        <Card className="border-[#DCFCE7] bg-[#F0FDF4] shadow-sm mb-6 rounded-2xl overflow-hidden">
+        <Card className="border-gray-100 bg-white shadow-sm mb-8 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
             <CardContent className="p-0">
-                <div className="flex flex-col md:flex-row items-stretch divide-y md:divide-y-0 md:divide-x divide-[#DCFCE7]">
+                <div className="flex flex-col lg:flex-row items-stretch">
 
-                    {/* Location */}
-                    <div className="flex-1 flex items-center gap-4 p-4 md:p-6 hover:bg-[#DCFCE7]/30 transition-colors">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-sm shrink-0 flex items-center justify-center border border-green-100">
-                            <MapPin className="w-5 h-5 md:w-6 md:h-6 text-red-500" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-[10px] md:text-xs text-green-700/70 font-bold uppercase tracking-widest truncate mb-0.5">{t('location')}</p>
-                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-lg truncate leading-tight">
+                    {/* Left: Metadata Grid */}
+                    <div className="flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 divide-x divide-y md:divide-y-0 divide-gray-50 bg-white">
+                        {/* Location */}
+                        <div className="p-4 md:p-6 flex flex-col justify-center gap-1 hover:bg-gray-50/50 transition-colors">
+                            <div className="flex items-center gap-2 text-green-700/70 mb-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('location')}</span>
+                            </div>
+                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-base leading-tight">
                                 {district || profile.district || t('unknown')}, {province?.substring(0, 3) || profile.province?.substring(0, 3) || "PB"}
+                            </p>
+                        </div>
+
+                        {/* Crop */}
+                        <div className="p-4 md:p-6 flex flex-col justify-center gap-1 hover:bg-gray-50/50 transition-colors">
+                            <div className="flex items-center gap-2 text-amber-600/70 mb-1">
+                                <Wheat className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('crop')}</span>
+                            </div>
+                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-base leading-tight">
+                                {crop || profile.crop || "Wheat"}
+                            </p>
+                        </div>
+
+                        {/* Stage */}
+                        <div className="p-4 md:p-6 flex flex-col justify-center gap-1 hover:bg-gray-50/50 transition-colors">
+                            <div className="flex items-center gap-2 text-green-600/70 mb-1">
+                                <Sprout className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('stage')}</span>
+                            </div>
+                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-base leading-tight">
+                                {cropStage || profile.stage || "Vegetative"}
+                            </p>
+                        </div>
+
+                        {/* Irrigation */}
+                        <div className="p-4 md:p-6 flex flex-col justify-center gap-1 hover:bg-gray-50/50 transition-colors">
+                            <div className="flex items-center gap-2 text-blue-600/70 mb-1">
+                                <Droplet className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('irrigation_type')}</span>
+                            </div>
+                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-base leading-tight">
+                                {irrigation_type || profile.irrigation_type || "Canal"}
+                            </p>
+                        </div>
+
+                        {/* Soil */}
+                        <div className="p-4 md:p-6 flex flex-col justify-center gap-1 hover:bg-gray-50/50 transition-colors">
+                            <div className="flex items-center gap-2 text-yellow-600/70 mb-1">
+                                <Sprout className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('soil_type')}</span>
+                            </div>
+                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-base leading-tight">
+                                {soil_type || profile.soil_type || "Loam"}
                             </p>
                         </div>
                     </div>
 
-                    {/* Crop */}
-                    <div className="flex-1 flex items-center gap-4 p-4 md:p-6 hover:bg-[#DCFCE7]/30 transition-colors">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-sm shrink-0 flex items-center justify-center border border-green-100">
-                            <Wheat className="w-5 h-5 md:w-6 md:h-6 text-amber-500" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-[10px] md:text-xs text-green-700/70 font-bold uppercase tracking-widest truncate mb-0.5">{t('crop')}</p>
-                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-lg truncate leading-tight">{crop || profile.crop || "Wheat"}</p>
-                        </div>
-                    </div>
-
-                    {/* Stage */}
-                    <div className="flex-1 flex items-center gap-4 p-4 md:p-6 hover:bg-[#DCFCE7]/30 transition-colors">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-sm shrink-0 flex items-center justify-center border border-green-100">
-                            <Sprout className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-[10px] md:text-xs text-green-700/70 font-bold uppercase tracking-widest truncate mb-0.5">{t('stage')}</p>
-                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-lg truncate leading-tight">{cropStage || profile.stage || "Vegetative"}</p>
-                        </div>
-                    </div>
-                    {/* {Irrigation & Soil Type} */}
-                    <div className="flex-1 flex items-center gap-4 p-4 md:p-6 hover:bg-[#DCFCE7]/30 transition-colors">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-sm shrink-0 flex items-center justify-center border border-green-100">
-                            <Droplet className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-[10px] md:text-xs text-green-700/70 font-bold uppercase tracking-widest truncate mb-0.5">{t('irrigation_type')}</p>
-                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-lg truncate leading-tight">{irrigation_type || profile.irrigation_type || "Canal"}</p>
-                        </div>
-                    </div>
-                    <div className="flex-1 flex items-center gap-4 p-4 md:p-6 hover:bg-[#DCFCE7]/30 transition-colors">
-                        <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-sm shrink-0 flex items-center justify-center border border-green-100">
-                            <Sprout className="w-5 h-5 md:w-6 md:h-6 text-yellow-600" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-[10px] md:text-xs text-green-700/70 font-bold uppercase tracking-widest truncate mb-0.5">{t('soil_type')}</p>
-                            <p className="font-heading font-bold text-[#1B4332] text-sm md:text-lg truncate leading-tight">{soil_type || profile.soil_type || "Loam"}</p>
+                    {/* Right: Health Center (USP HIGHLIGHT) */}
+                    <div className="w-full lg:w-48 bg-[#F0FDF4] p-4 flex flex-col items-center justify-center border-t lg:border-t-0 lg:border-l border-green-100 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-16 h-16 bg-green-200/20 rounded-full blur-2xl -mr-8 -mt-8"></div>
+                        <RiskGauge score={healthScore} size={80} />
+                        <div className="mt-1 text-center">
+                            <div className={`text-[10px] font-bold uppercase tracking-tighter ${healthScore > 70 ? 'text-green-700' : 'text-amber-700'}`}>
+                                {healthScore > 80 ? 'Optimal' : healthScore > 50 ? 'Stable' : 'Unstable'}
+                            </div>
                         </div>
                     </div>
 

@@ -26,7 +26,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "welcome",
-            content: "Hello! I'm your AgriTech assistant. Ask me about crops, weather, diseases, or farming practices. I use our knowledge base to give you accurate answers.",
+            content: "Hello! I'm your ZaraiRadar assistant. Ask me about crops, weather, diseases, or farming practices. I use our knowledge base to give you accurate answers.",
             sender: "assistant",
             source: "Zarai Radar RAG",
             timestamp: new Date(),

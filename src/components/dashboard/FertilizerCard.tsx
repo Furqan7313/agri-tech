@@ -61,8 +61,10 @@ function extractFertilizerActionPlan(fertilizerCard: FertilizerCardData) {
     const nextApp = recommendation.next_application;
     let guidanceText = "";
     if (nextApp.status === "DUE_NOW") {
-        guidanceText = `Apply ${nextApp.products[0]?.full_name || 'fertilizer'} now at ${nextApp.sub_stage || nextApp.stage} stage. `;
-        guidanceText += nextApp.timing_note || nextApp.instructions;
+        guidanceText = `Apply ${nextApp.products?.[0]?.full_name || 'fertilizer'} now at ${nextApp.sub_stage || nextApp.stage} stage. `;
+        guidanceText += nextApp.timing_note || nextApp.instructions || "";
+    } else if (nextApp.status === "COMPLETE") {
+        guidanceText = "All scheduled applications for this season are complete. Monitor crop health during grain filling.";
     } else {
         guidanceText = "Apply nitrogen in split doses: 30% at sowing, 40% at tillering, 30% at jointing";
     }
@@ -70,10 +72,11 @@ function extractFertilizerActionPlan(fertilizerCard: FertilizerCardData) {
         npkRatio: npk,
         applicationGuidance: guidanceText,
         nextApplication: {
+            status: nextApp.status,
             stage: nextApp.sub_stage || nextApp.stage,
-            product: nextApp.products[0]?.full_name,
-            bags: nextApp.products[0]?.bags,
-            cost: nextApp.products[0]?.cost_pkr,
+            product: nextApp.products?.[0]?.full_name,
+            bags: nextApp.products?.[0]?.bags,
+            cost: nextApp.products?.[0]?.cost_pkr,
             urgency: nextApp.urgency,
             instructions: nextApp.instructions
         },
@@ -167,22 +170,30 @@ export function FertilizerCard({ crop, userId, area = 10 }: FertilizerCardProps)
                 {/* Application Notes */}
                 <div className="p-3 bg-[#F8F9F1] rounded-lg border border-[#E5E7EB]">
                     <p className="text-xs text-[#6B7280] mb-1">{t('appGuidance')}</p>
-                    <p className="text-sm text-[#1F2937]">{plan.applicationGuidance}</p>
+                    <p className="text-sm text-[#1F2937] leading-relaxed">{plan.applicationGuidance}</p>
                 </div>
+
                 {/* Next Application Details */}
-                <div className="p-3 bg-[#F0FDFA] rounded-lg border border-[#E5E7EB] mt-2">
-                    <p className="text-xs text-[#6B7280] mb-1">{t('nextApplication')}</p>
-                    <p className="text-sm text-[#1F2937]">
-                        {plan.nextApplication.product} ({plan.nextApplication.bags} bags) - Rs. {plan.nextApplication.cost}
-                        <br />Stage: {plan.nextApplication.stage} | Urgency: {plan.nextApplication.urgency}
-                        <br />Instructions: {plan.nextApplication.instructions}
-                    </p>
-                </div>
-                {/* Total Season Cost */}
-                <div className="p-3 bg-[#FFF7ED] rounded-lg border border-[#E5E7EB] mt-2">
-                    <p className="text-xs text-[#6B7280] mb-1">{t('totalSeasonCost')}</p>
-                    <p className="text-sm text-[#1F2937]">Rs. {plan.totalSeasonCost}</p>
-                </div>
+                {plan.nextApplication.status !== "COMPLETE" && plan.nextApplication.product && (
+                    <div className="p-3 bg-[#F0FDFA] rounded-lg border border-[#E5E7EB] mt-2">
+                        <p className="text-xs text-[#6B7280] mb-1">{t('nextApplication')}</p>
+                        <div className="space-y-1">
+                            <p className="text-sm font-bold text-[#115E59]">
+                                {plan.nextApplication.product} ({plan.nextApplication.bags} bags) - Rs. {plan.nextApplication.cost?.toLocaleString()}
+                            </p>
+                            <p className="text-xs text-[#1F2937]">
+                                <span className="font-semibold">Stage:</span> {plan.nextApplication.stage} | <span className="font-semibold">Urgency:</span> {plan.nextApplication.urgency}
+                            </p>
+                            {plan.nextApplication.instructions && (
+                                <p className="text-xs text-[#4B5563] italic">
+                                    {plan.nextApplication.instructions}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+
             </CardContent>
         </Card>
     );

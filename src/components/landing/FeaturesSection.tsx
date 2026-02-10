@@ -327,7 +327,6 @@ export function FeaturesSection() {
                         />
                         <FeatureImageCard
                             image="/smart-irrigation.png"
-                            badge={t('iotSensors')}
                             icon={Droplets}
                             title={t('smartIrrigationTitle')}
                             desc={t('knowExactly')}

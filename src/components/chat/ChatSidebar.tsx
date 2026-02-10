@@ -102,7 +102,7 @@ export function ChatSidebar() {
                                 <Sprout className="w-5 h-5" />
                             </div>
                             <div>
-                                <SheetTitle className="text-primary-foreground font-heading">AgriTech Assistant</SheetTitle>
+                                <SheetTitle className="text-primary-foreground font-heading">ZaraiRadar Assistant</SheetTitle>
                                 <p className="text-xs text-primary-foreground/80">Your farming advisor</p>
                             </div>
                         </div>
@@ -145,7 +145,7 @@ export function ChatSidebar() {
                                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
                                 <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
                             </div>
-                            <span className="text-xs">AgriTech is typing...</span>
+                            <span className="text-xs">ZaraiRadar is typing...</span>
                         </div>
                     )}
                     <div ref={messagesEndRef} />

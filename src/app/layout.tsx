@@ -18,12 +18,12 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "AgriTech Punjab | Data-Driven Agriculture Solutions",
+  title: "Zarai Radar",
   description: "Professional agriculture technology platform providing data-driven insights for farmers in Punjab. Access weather forecasts, crop recommendations, disease alerts, and irrigation planning.",
   keywords: ["agriculture", "Punjab", "farming", "crop management", "weather", "irrigation", "fertilizer", "agri-tech"],
-  authors: [{ name: "AgriTech Punjab" }],
+  authors: [{ name: "Zarai Radar" }],
   openGraph: {
-    title: "AgriTech Punjab | Data-Driven Agriculture",
+    title: "Zarai Radar",
     description: "Empowering farmers with data-driven agricultural insights",
     type: "website",
   },

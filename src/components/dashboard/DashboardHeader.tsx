@@ -20,7 +20,7 @@ import { getTranslation } from "@/lib/i18n";
 
 export function DashboardHeader() {
     const router = useRouter();
-    const { language, setLanguage } = useAgri();
+    const { language, setLanguage, dashboardData } = useAgri();
     const t = (key: any) => getTranslation(language, key);
 
     const [isEditOpen, setIsEditOpen] = useState(false);
@@ -79,11 +79,11 @@ export function DashboardHeader() {
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-16 lg:h-20">
                     {/* Logo Only */}
-                    <Link href="/dashboard" className="flex items-center">
+                    <Link href="/" className="flex items-center">
                         <img
-                            src="/logo-transparent.png"
+                            src="/zr_logo.png"
                             alt="ZaraiRadar"
-                            className="h-12 w-auto"
+                            className="h-25 lg:h-30 w-auto transition-transform hover:scale-105"
                         />
                     </Link>
 
@@ -163,7 +163,7 @@ export function DashboardHeader() {
                                         <User className="w-4 h-4 text-white" />
                                     </div>
                                     <span className="font-medium text-sm max-w-[100px] truncate hidden sm:inline">
-                                        {language === 'ur' ? 'فعال کسان' : 'Active Farmer'}
+                                        {dashboardData?.profile?.username || username || (language === 'ur' ? 'فعال کسان' : 'Active Farmer')}
                                     </span>
                                     <ChevronDown className="w-4 h-4 shrink-0" />
                                 </Button>

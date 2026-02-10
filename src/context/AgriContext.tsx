@@ -57,7 +57,7 @@ export function AgriProvider({ children }: { children: ReactNode }) {
         setIsDashboardLoading(true);
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout to handle slow weather/RAG calls
 
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/dashboard/overview`,
@@ -83,6 +83,17 @@ export function AgriProvider({ children }: { children: ReactNode }) {
                     if (!cropStage) setCropStage(data.profile.stage);
                     if (!irrigation_type) setIrrigationType(data.profile.irrigation_type);
                     if (!soil_type) setSoilType(data.profile.soil_type);
+                }
+            } else if (res.status === 401) {
+                // Token is invalid/expired
+                console.warn("Session expired or invalid token. Redirecting to login...");
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("user_email");
+                localStorage.removeItem("username");
+                // Trigger a page reload or redirect if on a protected route
+                if (window.location.pathname.startsWith('/dashboard')) {
+                    window.location.href = '/login';
                 }
             }
         } catch (error) {
